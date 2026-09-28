@@ -3645,19 +3645,29 @@
   var savedKey = '';
   try { savedKey = localStorage.getItem('portal_special_key') || ''; } catch(e) {}
   var configEl = document.getElementById('portal-config');
-  var isSpecialUser = !isLogout && ((keyFromUrl === 'margarita2026') || (savedKey === 'margarita2026') || (configEl && configEl.getAttribute('data-special') === '1'));
+  
+  var isMargo = !isLogout && ((keyFromUrl === 'margarita2026') || (savedKey === 'margarita2026') || (configEl && configEl.getAttribute('data-special') === '1'));
+  var isRemi131 = !isLogout && ((keyFromUrl === 'remi131') || (savedKey === 'remi131'));
+  
+  var isSpecialUser = isMargo;
 
-  if (!isLogout && keyFromUrl === 'margarita2026') {
-    try { localStorage.setItem('portal_special_key', 'margarita2026'); } catch(e) {}
+  if (!isLogout && (keyFromUrl === 'margarita2026' || keyFromUrl === 'remi131')) {
+    try { localStorage.setItem('portal_special_key', keyFromUrl); } catch(e) {}
   }
 
   function applySpecialUserUI() {
-    if (isSpecialUser) {
+    if (isMargo) {
       document.documentElement.classList.add('is-special');
       if (document.body) document.body.classList.add('is-special');
       $('#portal-auth-icon').text('🔓');
       $('#portal-auth-text').text('Маргарита');
       $('#btn-portal-auth').attr('title', 'Спецрежим активен. Кликните, чтобы выйти').addClass('btn-outline-success').removeClass('btn-outline-secondary');
+    } else if (isRemi131) {
+      document.documentElement.classList.remove('is-special');
+      if (document.body) document.body.classList.remove('is-special');
+      $('#portal-auth-icon').text('🔓');
+      $('#portal-auth-text').text('1 Смена');
+      $('#btn-portal-auth').attr('title', 'Доступ 1 Смена активен. Кликните, чтобы выйти').addClass('btn-outline-success').removeClass('btn-outline-secondary');
     } else {
       document.documentElement.classList.remove('is-special');
       if (document.body) document.body.classList.remove('is-special');
@@ -3670,18 +3680,37 @@
   applySpecialUserUI();
   $(document).ready(function() {
     applySpecialUserUI();
+    
+    // Управление видимостью вкладки 1 Смена
+    var shiftTabLi = $('#pills-shift-tab').parent();
+    if (isMargo || isRemi131) {
+      shiftTabLi.show();
+      if (isRemi131) {
+        // Автоматически открываем 1 Смена для remi131
+        var shiftTab = new bootstrap.Tab(document.querySelector('#pills-shift-tab'));
+        shiftTab.show();
+      }
+    } else {
+      shiftTabLi.hide();
+      // Если мы скрыли 1 Смену, а она была активна, переключаемся на Потребности
+      if ($('#pills-shift-tab').hasClass('active')) {
+         var needsTab = new bootstrap.Tab(document.querySelector('#pills-needs-tab'));
+         needsTab.show();
+      }
+    }
+
     $('#btn-portal-auth').on('click', function() {
-      if (isSpecialUser) {
-        if (confirm('Выйти из режима доступа Маргариты? Закрытые вкладки будут скрыты.')) {
+      if (isMargo || isRemi131) {
+        if (confirm('Выйти из режима доступа? Закрытые вкладки будут скрыты.')) {
           try { localStorage.removeItem('portal_special_key'); } catch(e) {}
           window.location.href = window.location.pathname + '?logout=1';
         }
       } else {
         var inputKey = prompt('Введите ключ доступа к закрытым разделам:');
         if (inputKey) {
-          if (inputKey.trim() === 'margarita2026') {
-            try { localStorage.setItem('portal_special_key', 'margarita2026'); } catch(e) {}
-            window.location.href = window.location.pathname + '?key=margarita2026';
+          if (inputKey.trim() === 'margarita2026' || inputKey.trim() === 'remi131') {
+            try { localStorage.setItem('portal_special_key', inputKey.trim()); } catch(e) {}
+            window.location.href = window.location.pathname + '?key=' + encodeURIComponent(inputKey.trim());
           } else {
             alert('Неверный ключ доступа.');
           }
