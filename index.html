@@ -4526,33 +4526,61 @@
         .withFailureHandler(failCb || function(err) { console.error('Error ' + action, err); })
         [action]();
     } else {
-      var keyParam = (isSpecialUser) ? '&key=margarita2026' : '';
+      var keyParam = '';
+      if (typeof isMargo !== 'undefined' && isMargo) keyParam = '&key=margarita2026';
+      else if (typeof isRemi131 !== 'undefined' && isRemi131) keyParam = '&key=remi131';
+      else if (typeof isSpecialUser !== 'undefined' && isSpecialUser) keyParam = '&key=margarita2026';
+      
       var apiUrl = '/api/data?action=' + encodeURIComponent(action) + keyParam;
-      fetch(apiUrl)
-        .then(function(res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.json();
-        })
-        .then(function(json) {
-          if (json && json.status === 'success') {
-            successCb(json.data);
-          } else {
-            throw new Error(json ? json.message : 'API error');
-          }
-        })
-        .catch(function(err) {
-          console.warn('Vercel proxy not responding, calling direct GAS:', err);
-          fetch(GAS_FALLBACK_URL + '?action=' + encodeURIComponent(action) + keyParam)
-            .then(function(r) { return r.json(); })
-            .then(function(j) {
-              if (j && j.status === 'success') successCb(j.data);
-              else if (failCb) failCb(j ? j.message : 'Direct GAS error');
-            })
-            .catch(function(e2) {
-              console.error('Direct GAS error ' + action, e2);
-              if (failCb) failCb(e2);
-            });
-        });
+      
+      // Если мы на GitHub Pages, идем напрямую в Google Apps Script
+      if (window.location.hostname.includes('github.io') || window.location.protocol === 'file:') {
+        apiUrl = GAS_FALLBACK_URL + '?action=' + encodeURIComponent(action) + keyParam;
+        
+        fetch(apiUrl)
+          .then(function(res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function(json) {
+            if (json && json.status === 'success') {
+              successCb(json.data);
+            } else {
+              if (failCb) failCb(json ? json.message : 'API error');
+            }
+          })
+          .catch(function(err) {
+            console.error('GAS API Error:', err);
+            if (failCb) failCb(err);
+          });
+      } else {
+        // Старая логика для Vercel
+        fetch(apiUrl)
+          .then(function(res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function(json) {
+            if (json && json.status === 'success') {
+              successCb(json.data);
+            } else {
+              throw new Error(json ? json.message : 'API error');
+            }
+          })
+          .catch(function(err) {
+            console.warn('Vercel proxy not responding, calling direct GAS:', err);
+            fetch(GAS_FALLBACK_URL + '?action=' + encodeURIComponent(action) + keyParam)
+              .then(function(r) { return r.json(); })
+              .then(function(j) {
+                if (j && j.status === 'success') successCb(j.data);
+                else if (failCb) failCb(j ? j.message : 'Direct GAS error');
+              })
+              .catch(function(e2) {
+                console.error('Direct GAS error ' + action, e2);
+                if (failCb) failCb(e2);
+              });
+          });
+      }
     }
   }
 
