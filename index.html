@@ -2451,6 +2451,12 @@
               <div class="col-md-2 col-sm-4 col-6"><div class="filter-label">Номер ТК</div><div id="filter-s-store"></div></div>
               <div class="col-md-2 col-sm-4 col-6"><div class="filter-label">Город</div><div id="filter-s-city"></div></div>
               <div class="col-md-2 col-sm-4 col-6"><div class="filter-label">Должность</div><div id="filter-s-position"></div></div>
+                <div class="col-md-2 col-sm-4 col-12 d-flex align-items-end">
+                  <div class="form-check mb-1">
+                    <input class="form-check-input" type="checkbox" id="shift-unique-phone">
+                    <label class="form-check-label filter-label" for="shift-unique-phone" style="text-transform:none; font-size:0.75rem;">Без дублей (тел.)</label>
+                  </div>
+                </div>
               <div class="col-md-2 col-sm-4 col-6"><div class="filter-label">Команда</div><div id="filter-s-team"></div></div>
               <div class="col-md-2 col-sm-4 col-6">
                 <div class="filter-label">Сверка смен</div>
@@ -2635,6 +2641,20 @@
             </button>
           </div>
         </div>
+          <div class="d-flex align-items-center gap-2 flex-wrap mb-3 analysis-extra-filters">
+            <div class="d-flex align-items-center gap-1">
+              <span style="font-size: 0.75rem; color: var(--ios-text-secondary); font-weight: 500;">От:</span>
+              <input type="date" id="analysis-date-from" class="form-control input-compact" style="max-width: 120px; font-size: 0.75rem; height: 30px;">
+            </div>
+            <div class="d-flex align-items-center gap-1">
+              <span style="font-size: 0.75rem; color: var(--ios-text-secondary); font-weight: 500;">До:</span>
+              <input type="date" id="analysis-date-to" class="form-control input-compact" style="max-width: 120px; font-size: 0.75rem; height: 30px;">
+            </div>
+            <div class="form-check ms-2 d-flex align-items-center gap-1">
+              <input class="form-check-input mt-0" type="checkbox" id="analysis-unique-phone" style="width: 15px; height: 15px;">
+              <label class="form-check-label filter-label" for="analysis-unique-phone" style="text-transform:none; margin-bottom:0; font-size: 0.75rem;">Без дублей (по тел.)</label>
+            </div>
+          </div>
 
         <!-- 1. ПОТРЕБНОСТИ -->
         <div class="analysis-section-block" data-cat="needs">
@@ -3636,81 +3656,114 @@
 <script src="/vendor/chart.umd.min.js"></script>
 
 <script>
-  var urlParams = new URLSearchParams(window.location.search);
-  var isLogout = urlParams.get('logout') === '1';
-  if (isLogout) {
-    try { localStorage.removeItem('portal_special_key'); } catch(e) {}
-  }
-  var keyFromUrl = urlParams.get('key');
-  var savedKey = '';
-  try { savedKey = localStorage.getItem('portal_special_key') || ''; } catch(e) {}
-  var configEl = document.getElementById('portal-config');
+  var isMargo = false;
+  var isRemi131 = false;
+  var isSpecialUser = false;
+  var isLogout = false;
   
-  var isMargo = !isLogout && ((keyFromUrl === 'margarita2026') || (savedKey === 'margarita2026') || (configEl && configEl.getAttribute('data-special') === '1'));
-  var isRemi131 = !isLogout && ((keyFromUrl === 'remi131') || (savedKey === 'remi131'));
-  
-  var isSpecialUser = isMargo;
+  function initKeys(keyFromUrl, logoutParam) {
+    isLogout = logoutParam === '1';
+    if (isLogout) {
+      try { localStorage.removeItem('portal_special_key'); } catch(e) {}
+    }
+    var savedKey = '';
+    try { localStorage.getItem('portal_special_key'); savedKey = localStorage.getItem('portal_special_key') || ''; } catch(e) {}
+    var configEl = document.getElementById('portal-config');
+    
+    isMargo = !isLogout && ((keyFromUrl === 'margarita2026') || (savedKey === 'margarita2026') || (configEl && configEl.getAttribute('data-special') === '1'));
+    isRemi131 = !isLogout && ((keyFromUrl === 'remi131') || (savedKey === 'remi131'));
+    isSpecialUser = isMargo;
 
-  if (!isLogout && (keyFromUrl === 'margarita2026' || keyFromUrl === 'remi131')) {
-    try { localStorage.setItem('portal_special_key', keyFromUrl); } catch(e) {}
+    if (!isLogout && (keyFromUrl === 'margarita2026' || keyFromUrl === 'remi131')) {
+      try { localStorage.setItem('portal_special_key', keyFromUrl); } catch(e) {}
+    }
   }
+
+  var urlParams = new URLSearchParams(window.location.search);
+  initKeys(urlParams.get('key'), urlParams.get('logout'));
 
   function applySpecialUserUI() {
     if (isMargo) {
       document.documentElement.classList.add('is-special');
       if (document.body) document.body.classList.add('is-special');
-      $('#portal-auth-icon').text('🔓');
-      $('#portal-auth-text').text('Маргарита');
-      $('#btn-portal-auth').attr('title', 'Спецрежим активен. Кликните, чтобы выйти').addClass('btn-outline-success').removeClass('btn-outline-secondary');
+      $('#portal-auth-icon').text('🔐');
+      $('#portal-auth-text').text('Марго');
+      $('#btn-portal-auth').attr('title', 'Скрытые функции активны. Нажмите, чтобы выйти.').addClass('btn-outline-success').removeClass('btn-outline-secondary');
     } else if (isRemi131) {
       document.documentElement.classList.remove('is-special');
       if (document.body) document.body.classList.remove('is-special');
-      $('#portal-auth-icon').text('🔓');
+      $('#portal-auth-icon').text('🔐');
       $('#portal-auth-text').text('1 Смена');
-      $('#btn-portal-auth').attr('title', 'Доступ 1 Смена активен. Кликните, чтобы выйти').addClass('btn-outline-success').removeClass('btn-outline-secondary');
+      $('#btn-portal-auth').attr('title', 'Режим 1 смены активен. Нажмите, чтобы выйти.').addClass('btn-outline-success').removeClass('btn-outline-secondary');
     } else {
       document.documentElement.classList.remove('is-special');
       if (document.body) document.body.classList.remove('is-special');
-      $('#portal-auth-icon').text('🔒');
-      $('#portal-auth-text').text('Войти');
-      $('#btn-portal-auth').attr('title', 'Ввести ключ доступа для закрытых вкладок').addClass('btn-outline-secondary').removeClass('btn-outline-success');
+      $('#portal-auth-icon').text('🔓');
+      $('#portal-auth-text').text('Вход');
+      $('#btn-portal-auth').attr('title', 'Ввести ключ доступа к скрытым функциям').addClass('btn-outline-secondary').removeClass('btn-outline-success');
     }
   }
 
-  applySpecialUserUI();
-  $(document).ready(function() {
+  function initUI() {
     applySpecialUserUI();
     
-    // Управление видимостью вкладки 1 Смена
     var shiftTabLi = $('#pills-shift-tab').parent();
     if (isMargo || isRemi131) {
       shiftTabLi.show();
       if (isRemi131) {
-        // Автоматически открываем 1 Смена для remi131
         var shiftTab = new bootstrap.Tab(document.querySelector('#pills-shift-tab'));
         shiftTab.show();
       }
     } else {
       shiftTabLi.hide();
-      // Если мы скрыли 1 Смену, а она была активна, переключаемся на Потребности
       if ($('#pills-shift-tab').hasClass('active')) {
          var needsTab = new bootstrap.Tab(document.querySelector('#pills-needs-tab'));
          needsTab.show();
       }
     }
+  }
+
+  $(document).ready(function() {
+    if (typeof google !== 'undefined' && google.script && google.script.url) {
+      google.script.url.getLocation(function(loc) {
+        var k = loc.parameter.key ? loc.parameter.key[0] : null;
+        var l = loc.parameter.logout ? loc.parameter.logout[0] : null;
+        if (k || l) {
+           initKeys(k, l);
+        }
+        initUI();
+      });
+    } else {
+      initUI();
+    }
 
     $('#btn-portal-auth').on('click', function() {
+      var isGithub = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
+      
       if (isMargo || isRemi131) {
-        if (confirm('Выйти из режима доступа? Закрытые вкладки будут скрыты.')) {
+        if (confirm('Вы уверены, что хотите выйти из учетной записи?')) {
           try { localStorage.removeItem('portal_special_key'); } catch(e) {}
-          window.location.href = window.location.pathname + '?logout=1';
+          if (isGithub) {
+            window.location.href = window.location.pathname + '?logout=1';
+          } else {
+            initKeys(null, '1');
+            initUI();
+            $('#btn-refresh-all').trigger('click');
+          }
         }
       } else {
-        var inputKey = prompt('Введите ключ доступа к закрытым разделам:');
+        var inputKey = prompt('Введите ключ доступа:');
         if (inputKey) {
-          if (inputKey.trim() === 'margarita2026' || inputKey.trim() === 'remi131') {
-            try { localStorage.setItem('portal_special_key', inputKey.trim()); } catch(e) {}
-            window.location.href = window.location.pathname + '?key=' + encodeURIComponent(inputKey.trim());
+          var val = inputKey.trim();
+          if (val === 'margarita2026' || val === 'remi131') {
+            try { localStorage.setItem('portal_special_key', val); } catch(e) {}
+            if (isGithub) {
+              window.location.href = window.location.pathname + '?key=' + encodeURIComponent(val);
+            } else {
+              initKeys(val, null);
+              initUI();
+              $('#btn-refresh-all').trigger('click');
+            }
           } else {
             alert('Неверный ключ доступа.');
           }
@@ -3718,7 +3771,6 @@
       }
     });
   });
-
   const COL_STORE = 0;    
   const COL_ADDRESS = 1;  
   const COL_CITY = 2;     
@@ -3746,6 +3798,36 @@
   var analysisCharts = {};
   var analysisCustomSpecs = [];
   var analysisChartSequence = 0;
+    function filterShiftRowsForAnalytics(rows) {
+      if (!rows) return [];
+      var fromStr = $('#analysis-date-from').val(); 
+      var toStr = $('#analysis-date-to').val(); 
+      var fromTs = fromStr ? parseDateForSort(fromStr.split('-').reverse().join('.')) : null;
+      var toTs = toStr ? parseDateForSort(toStr.split('-').reverse().join('.') + ' 23:59:59') : null;
+      var uniquePhone = $('#analysis-unique-phone').is(':checked');
+      var seenPhones = {};
+      
+      return rows.filter(function(row) {
+        if (fromTs || toTs) {
+          var dateStr = (row[14] || '').toString().trim();
+          var ts = parseDateForSort(dateStr);
+          if (ts) {
+            if (fromTs && ts < fromTs) return false;
+            if (toTs && ts > toTs) return false;
+          }
+        }
+        if (uniquePhone) {
+          var p1 = (row[shiftPhoneColIdx] || '').toString().replace(/\D/g, '');
+          var p2 = (row[SHIFT_PHONE_COL] || '').toString().replace(/\D/g, '');
+          var p = (p1.length >= 10) ? p1 : p2;
+          if (p && p.length >= 10) {
+            if (seenPhones[p]) return false;
+            seenPhones[p] = true;
+          }
+        }
+        return true;
+      });
+    }
   let workedPersonsMap = {};
   let shiftFioColIdx = 4;
   let shiftPhoneColIdx = SHIFT_PHONE_COL;
@@ -4526,61 +4608,33 @@
         .withFailureHandler(failCb || function(err) { console.error('Error ' + action, err); })
         [action]();
     } else {
-      var keyParam = '';
-      if (typeof isMargo !== 'undefined' && isMargo) keyParam = '&key=margarita2026';
-      else if (typeof isRemi131 !== 'undefined' && isRemi131) keyParam = '&key=remi131';
-      else if (typeof isSpecialUser !== 'undefined' && isSpecialUser) keyParam = '&key=margarita2026';
-      
+      var keyParam = (isSpecialUser) ? '&key=margarita2026' : '';
       var apiUrl = '/api/data?action=' + encodeURIComponent(action) + keyParam;
-      
-      // Если мы на GitHub Pages, идем напрямую в Google Apps Script
-      if (window.location.hostname.includes('github.io') || window.location.protocol === 'file:') {
-        apiUrl = GAS_FALLBACK_URL + '?action=' + encodeURIComponent(action) + keyParam;
-        
-        fetch(apiUrl)
-          .then(function(res) {
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            return res.json();
-          })
-          .then(function(json) {
-            if (json && json.status === 'success') {
-              successCb(json.data);
-            } else {
-              if (failCb) failCb(json ? json.message : 'API error');
-            }
-          })
-          .catch(function(err) {
-            console.error('GAS API Error:', err);
-            if (failCb) failCb(err);
-          });
-      } else {
-        // Старая логика для Vercel
-        fetch(apiUrl)
-          .then(function(res) {
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            return res.json();
-          })
-          .then(function(json) {
-            if (json && json.status === 'success') {
-              successCb(json.data);
-            } else {
-              throw new Error(json ? json.message : 'API error');
-            }
-          })
-          .catch(function(err) {
-            console.warn('Vercel proxy not responding, calling direct GAS:', err);
-            fetch(GAS_FALLBACK_URL + '?action=' + encodeURIComponent(action) + keyParam)
-              .then(function(r) { return r.json(); })
-              .then(function(j) {
-                if (j && j.status === 'success') successCb(j.data);
-                else if (failCb) failCb(j ? j.message : 'Direct GAS error');
-              })
-              .catch(function(e2) {
-                console.error('Direct GAS error ' + action, e2);
-                if (failCb) failCb(e2);
-              });
-          });
-      }
+      fetch(apiUrl)
+        .then(function(res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function(json) {
+          if (json && json.status === 'success') {
+            successCb(json.data);
+          } else {
+            throw new Error(json ? json.message : 'API error');
+          }
+        })
+        .catch(function(err) {
+          console.warn('Vercel proxy not responding, calling direct GAS:', err);
+          fetch(GAS_FALLBACK_URL + '?action=' + encodeURIComponent(action) + keyParam)
+            .then(function(r) { return r.json(); })
+            .then(function(j) {
+              if (j && j.status === 'success') successCb(j.data);
+              else if (failCb) failCb(j ? j.message : 'Direct GAS error');
+            })
+            .catch(function(e2) {
+              console.error('Direct GAS error ' + action, e2);
+              if (failCb) failCb(e2);
+            });
+        });
     }
   }
 
@@ -5841,6 +5895,7 @@
       $title.text('Воронка доходимости: Записано vs Отработало');
       $sub.text('Конверсия привлеченных кандидатов на 1 смену по командам рекрутинга');
       var shiftSource = analysisSources['shift'];
+      if (shiftSource) shiftSource = { headers: shiftSource.headers, rows: filterShiftRowsForAnalytics(shiftSource.rows) };
       var teams = ['HR', 'ПМ', 'РЕК', 'С', 'ВАУ', 'Остальные'];
       var teamStats = { 'HR': { reg: 0, wrk: 0 }, 'ПМ': { reg: 0, wrk: 0 }, 'РЕК': { reg: 0, wrk: 0 }, 'С': { reg: 0, wrk: 0 }, 'ВАУ': { reg: 0, wrk: 0 }, 'Остальные': { reg: 0, wrk: 0 } };
       var grandReg = 0, grandWrk = 0;
@@ -5889,6 +5944,7 @@
       $title.text('География выхода на 1 смену по городам');
       $sub.text('Полный рейтинг городов по количеству записанных и вышедших на стажировку кандидатов');
       var shiftSource = analysisSources['shift'];
+      if (shiftSource) shiftSource = { headers: shiftSource.headers, rows: filterShiftRowsForAnalytics(shiftSource.rows) };
       var cityMap = {};
       if (shiftSource && shiftSource.rows) {
         shiftSource.rows.forEach(function(row) {
@@ -5932,6 +5988,7 @@
       $title.text('ТОП магазинов по приему новичков на 1 смену');
       $sub.text('Статистика направлений кандидатов на магазины (ТК) и их фактический выход');
       var shiftSource = analysisSources['shift'];
+      if (shiftSource) shiftSource = { headers: shiftSource.headers, rows: filterShiftRowsForAnalytics(shiftSource.rows) };
       var sMap = {};
       if (shiftSource && shiftSource.rows) {
         shiftSource.rows.forEach(function(row) {
@@ -6235,6 +6292,7 @@
     if (!canvas || !window.Chart) return;
 
     var shiftSource = analysisSources['shift'];
+      if (shiftSource) shiftSource = { headers: shiftSource.headers, rows: filterShiftRowsForAnalytics(shiftSource.rows) };
     if (!shiftSource || !shiftSource.rows || !shiftSource.rows.length) return;
 
     var teams = ['HR', 'ПМ', 'РЕК', 'С', 'ВАУ', 'Остальные'];
@@ -6328,6 +6386,7 @@
     if (!canvas || !window.Chart) return;
 
     var shiftSource = analysisSources['shift'];
+      if (shiftSource) shiftSource = { headers: shiftSource.headers, rows: filterShiftRowsForAnalytics(shiftSource.rows) };
     if (!shiftSource || !shiftSource.rows || !shiftSource.rows.length) return;
 
     var teams = ['HR', 'ПМ', 'РЕК', 'С', 'ВАУ', 'Остальные'];
@@ -6401,6 +6460,7 @@
     if (!canvas || !window.Chart) return;
 
     var shiftSource = analysisSources['shift'];
+      if (shiftSource) shiftSource = { headers: shiftSource.headers, rows: filterShiftRowsForAnalytics(shiftSource.rows) };
     if (!shiftSource || !shiftSource.rows || !shiftSource.rows.length) return;
 
     var cityMap = {};
@@ -6498,6 +6558,7 @@
     if (!canvas || !window.Chart) return;
 
     var shiftSource = analysisSources['shift'];
+      if (shiftSource) shiftSource = { headers: shiftSource.headers, rows: filterShiftRowsForAnalytics(shiftSource.rows) };
     if (!shiftSource || !shiftSource.rows || !shiftSource.rows.length) return;
 
     var dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
@@ -6563,6 +6624,7 @@
     if (!canvas || !window.Chart) return;
 
     var shiftSource = analysisSources['shift'];
+      if (shiftSource) shiftSource = { headers: shiftSource.headers, rows: filterShiftRowsForAnalytics(shiftSource.rows) };
     if (!shiftSource || !shiftSource.rows || !shiftSource.rows.length) return;
 
     var storeMap = {};
@@ -7784,6 +7846,8 @@
     $(document).off('click', '#analysis-global-refresh').on('click', '#analysis-global-refresh', function() {
       refreshAnalysisCharts();
     });
+      $('#analysis-date-from, #analysis-date-to, #analysis-unique-phone').on('change', refreshAnalysisCharts);
+      $('#shift-unique-phone').on('change', function() { if (dtShift) dtShift.draw(); });
 
     $(document).off('click', '.btn-analysis-fullscreen').on('click', '.btn-analysis-fullscreen', function() {
       var chartId = $(this).attr('data-chart');
