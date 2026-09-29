@@ -4609,31 +4609,39 @@
         [action]();
     } else {
       var keyParam = (isSpecialUser) ? '&key=margarita2026' : '';
-      var apiUrl = '/api/data?action=' + encodeURIComponent(action) + keyParam;
-      fetch(apiUrl)
-        .then(function(res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.json();
-        })
-        .then(function(json) {
-          if (json && json.status === 'success') {
-            successCb(json.data);
-          } else {
-            throw new Error(json ? json.message : 'API error');
-          }
-        })
-        .catch(function(err) {
-          console.warn('Vercel proxy not responding, calling direct GAS:', err);
+        var isGh = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
+        
+        function callDirectGas() {
           fetch(GAS_FALLBACK_URL + '?action=' + encodeURIComponent(action) + keyParam)
             .then(function(r) { return r.json(); })
             .then(function(j) {
               if (j && j.status === 'success') successCb(j.data);
-              else if (failCb) failCb(j ? j.message : 'Direct GAS error');
+              else throw new Error(j ? j.message : 'GAS error');
             })
-            .catch(function(e2) {
-              console.error('Direct GAS error ' + action, e2);
-              if (failCb) failCb(e2);
+            .catch(function(e) { if (failCb) failCb(e); });
+        }
+        
+        if (isGh) {
+          callDirectGas();
+        } else {
+          var apiUrl = '/api/data?action=' + encodeURIComponent(action) + keyParam;
+          fetch(apiUrl)
+            .then(function(res) {
+              if (!res.ok) throw new Error('HTTP ' + res.status);
+              return res.json();
+            })
+            .then(function(json) {
+              if (json && json.status === 'success') {
+                successCb(json.data);
+              } else {
+                throw new Error(json ? json.message : 'API error');
+              }
+            })
+            .catch(function(err) {
+              console.warn('Vercel proxy not responding, calling direct GAS:', err);
+              callDirectGas();
             });
+        }
         });
     }
   }
