@@ -4599,48 +4599,46 @@
     });
   });
 
-  var GAS_FALLBACK_URL = 'https://script.google.com/macros/s/AKfycbx2Zrd2LpjMwEEdPwIkr3IvAB83qhJmdbHbkY4kaIC8EecbX872VV0UN1qUZxpqs4zUkA/exec';
+  var GAS_FALLBACK_URL = 'https://script.google.com/macros/s/AKfycbx2Zrd2LpjMwEEdPwIkr3IvAB83qhJmdbHbkY4kaIC8EecbX872VV0UN1qUZxpqs4zUkA/exec';    var gasApiQueue = [];
+    var isGasApiRunning = false;
 
-  function callGasApi(action, successCb, failCb) {
-    if (typeof google !== 'undefined' && google.script && google.script.run) {
-      google.script.run
-        .withSuccessHandler(successCb)
-        .withFailureHandler(failCb || function(err) { console.error('Error ' + action, err); })
-        [action]();
-    } else {
+    function processGasApiQueue() {
+      if (gasApiQueue.length === 0) {
+        isGasApiRunning = false;
+        return;
+      }
+      isGasApiRunning = true;
+      var req = gasApiQueue.shift();
+      
       var keyParam = (isSpecialUser) ? '&key=margarita2026' : '';
-        var isGh = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
-        
-        function callDirectGas() {
-          fetch(GAS_FALLBACK_URL + '?action=' + encodeURIComponent(action) + keyParam)
-            .then(function(r) { return r.json(); })
-            .then(function(j) {
-              if (j && j.status === 'success') successCb(j.data);
-              else throw new Error(j ? j.message : 'GAS error');
-            })
-            .catch(function(e) { if (failCb) failCb(e); });
-        }
-        
-        if (isGh) {
-          callDirectGas();
-        } else {
-          var apiUrl = '/api/data?action=' + encodeURIComponent(action) + keyParam;
-          fetch(apiUrl)
-            .then(function(res) {
-              if (!res.ok) throw new Error('HTTP ' + res.status);
-              return res.json();
-            })
-            .then(function(json) {
-              if (json && json.status === 'success') {
-                successCb(json.data);
-              } else {
-                throw new Error(json ? json.message : 'API error');
-              }
-            })
-            .catch(function(err) {
-              console.warn('Vercel proxy not responding, calling direct GAS:', err);
-              callDirectGas();
-            });
+      fetch(GAS_FALLBACK_URL + '?action=' + encodeURIComponent(req.action) + keyParam)
+        .then(function(r) { return r.json(); })
+        .then(function(j) {
+          if (j && j.status === 'success') {
+            if (req.successCb) req.successCb(j.data);
+          } else {
+            throw new Error(j ? j.message : 'GAS error');
+          }
+        })
+        .catch(function(e) {
+          if (req.failCb) req.failCb(e);
+          else console.error('GAS API Error:', e);
+        })
+        .finally(function() {
+          setTimeout(processGasApiQueue, 200);
+        });
+    }
+
+    function callGasApi(action, successCb, failCb) {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(successCb)
+          .withFailureHandler(failCb || function(err) { console.error('Error ' + action, err); })
+          [action]();
+      } else {
+        gasApiQueue.push({action: action, successCb: successCb, failCb: failCb});
+        if (!isGasApiRunning) {
+          processGasApiQueue();
         }
       }
     }
