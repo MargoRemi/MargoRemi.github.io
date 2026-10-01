@@ -3777,7 +3777,8 @@
   const COL_DIVISION = 3; 
   const COL_FORMAT = 4;   
   const COL_POSITION = 5; 
-  const COL_PRIORITY = 7; 
+  const COL_PEOPLE_COUNT = 7;
+  const COL_PRIORITY = 8; 
   const COL_STATUS = 9;   
 
   // СТОЛБЕЦ N В 1 СМЕНЕ (индекс 13) и СТОЛБЕЦ C В СВЕРКЕ (индекс 2)
@@ -4610,12 +4611,23 @@
     } else {
       var keyParam = (isSpecialUser) ? '&key=margarita2026' : '';
       var isGh = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
+      var cacheKey = 'remi_cache_' + action + (isSpecialUser ? '_margo' : '');
       
       function callDirectGas() {
+        var cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          try {
+            successCb(JSON.parse(cached));
+          } catch(e) {}
+        }
+        
         fetch(GAS_FALLBACK_URL + '?action=' + encodeURIComponent(action) + keyParam)
           .then(function(r) { return r.json(); })
           .then(function(j) {
-            if (j && j.status === 'success') successCb(j.data);
+            if (j && j.status === 'success') {
+              try { localStorage.setItem(cacheKey, JSON.stringify(j.data)); } catch(e) {}
+              successCb(j.data);
+            }
             else if (failCb) failCb(j ? j.message : 'Direct GAS error');
           })
           .catch(function(e2) {
@@ -4740,7 +4752,7 @@
         return p ? ('Приоритет ' + p) : 'Обычный';
       });
       addDimension('format', 'Формат', function(row) { return row[COL_FORMAT]; });
-      addSumMetric('people', 'Требуется людей', function(row) { return cleanVal(row[8]) || 1; });
+      addSumMetric('people', 'Требуется людей', function(row) { return cleanVal(row[COL_PEOPLE_COUNT]) || 1; });
       addAverageMetric('rate', 'Средняя итоговая оплата', function(row) { return cleanVal(row[18]); });
     } else if (sourceId === 'shift') {
       addDimension('city', 'Город', function(row) { return row[3]; });
@@ -5012,7 +5024,7 @@
       var isPrio1 = prioStr.indexOf('1') !== -1;
       var isPrio2 = prioStr.indexOf('2') !== -1;
       var isPrio3 = prioStr.indexOf('3') !== -1;
-      var vac = cleanVal(row[8]) || 1;
+      var vac = cleanVal(row[COL_PEOPLE_COUNT]) || 1;
       grandTotalVacancies += vac;
 
       // 1. По городам
@@ -6173,7 +6185,7 @@
           var cNorm = normalizeText(rawCity);
           if (!cNorm) return;
           if (!cityLabelMap[cNorm]) cityLabelMap[cNorm] = rawCity;
-          planCity[cNorm] = (planCity[cNorm] || 0) + (cleanVal(row[8]) || 1);
+          planCity[cNorm] = (planCity[cNorm] || 0) + (cleanVal(row[COL_PEOPLE_COUNT]) || 1);
         });
       }
       var factCity = {};
@@ -6225,7 +6237,7 @@
           var pCanon = canonicalPosition(rawPos);
           if (!pCanon) return;
           if (!posLabelMap[pCanon]) posLabelMap[pCanon] = rawPos;
-          planPos[pCanon] = (planPos[pCanon] || 0) + (cleanVal(row[8]) || 1);
+          planPos[pCanon] = (planPos[pCanon] || 0) + (cleanVal(row[COL_PEOPLE_COUNT]) || 1);
         });
       }
       var factPos = {};
@@ -7474,7 +7486,7 @@
       var cNorm = normalizeText(rawCity);
       if (!cNorm) return;
       if (!cityLabelMap[cNorm]) cityLabelMap[cNorm] = rawCity;
-      var p = cleanVal(row[8]) || 1;
+      var p = cleanVal(row[COL_PEOPLE_COUNT]) || 1;
       planCity[cNorm] = (planCity[cNorm] || 0) + p;
     });
 
@@ -7575,7 +7587,7 @@
       var cNorm = normalizeText(rawCity);
       if (!cNorm) return;
       if (!cityLabelMap[cNorm]) cityLabelMap[cNorm] = rawCity;
-      var p = cleanVal(row[8]) || 1;
+      var p = cleanVal(row[COL_PEOPLE_COUNT]) || 1;
       planCity[cNorm] = (planCity[cNorm] || 0) + p;
     });
 
@@ -7677,7 +7689,7 @@
       var pCanon = canonicalPosition(rawPos);
       if (!pCanon) return;
       if (!posLabelMap[pCanon]) posLabelMap[pCanon] = rawPos;
-      var p = cleanVal(row[8]) || 1;
+      var p = cleanVal(row[COL_PEOPLE_COUNT]) || 1;
       planPos[pCanon] = (planPos[pCanon] || 0) + p;
     });
 
@@ -8527,7 +8539,7 @@
       var changeDate = getCardDate(row);
       
       var priority = (row[COL_PRIORITY] || '').toString();
-      var people = escapeHtml(row[8] || '1');
+      var people = escapeHtml(row[COL_PEOPLE] || '1');
       var status = escapeHtml(row[COL_STATUS] || 'Актуально');
       var levelVal = (row[10] || '').toString().trim();
       var levelNum = parseInt(levelVal.replace(/\D/g, ''), 10) || 1;
@@ -8694,7 +8706,7 @@
     var schedule = rawSchedule !== '' ? rawSchedule : 'По согласованию';
     var changeDate = getCardDate(row);
     var priority = (row[COL_PRIORITY] || '').toString().trim();
-    var people = (row[8] || '1').toString().trim();
+    var people = (row[COL_PEOPLE] || '1').toString().trim();
     var status = (row[COL_STATUS] || 'Актуально').toString().trim();
     var levelVal = (row[10] || '').toString().trim();
     var levelNum = parseInt(levelVal.replace(/\D/g, ''), 10) || 1;
@@ -8781,7 +8793,7 @@
       var schedule = rawSchedule !== '' ? rawSchedule : 'По согласованию';
       var changeDate = getCardDate(row);
       var priority = (row[COL_PRIORITY] || '').toString().trim();
-      var people = (row[8] || '1').toString().trim();
+      var people = (row[COL_PEOPLE] || '1').toString().trim();
       var levelVal = (row[10] || '').toString().trim();
       var levelNum = parseInt(levelVal.replace(/\D/g, ''), 10) || 1;
       if (levelNum < 1 || levelNum > 5) levelNum = 1;
