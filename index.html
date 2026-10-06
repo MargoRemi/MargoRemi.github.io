@@ -5027,6 +5027,9 @@
     var grandTotalVacancies = 0;
 
     needsSource.rows.forEach(function(row) {
+      var status = (row[COL_STATUS] || '').toString().trim().toLowerCase();
+      if (status !== 'актуально') return; // Игнорируем закрытые вакансии
+
       var rawCity = (row[COL_CITY] || '').toString().trim();
       if (!rawCity || rawCity.indexOf('#') === 0) return;
       var normCity = normalizeText(rawCity);
