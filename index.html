@@ -4596,11 +4596,24 @@
         if (workedFilter === 'not_worked' && status.isWorked) return false;
       }
 
+      if ($('#shift-unique-phone').is(':checked')) {
+        var cellPhoneStr = (data[shiftPhoneColIdx] || '').toString().replace(/\D/g, '');
+        if (cellPhoneStr.length < 10 && data[SHIFT_PHONE_COL]) {
+          cellPhoneStr = data[SHIFT_PHONE_COL].toString().replace(/\D/g, '');
+        }
+        var p = cellPhoneStr.length >= 10 ? cellPhoneStr.slice(-10) : '';
+        if (p) {
+          if (currentShiftSearchPhones[p]) return false;
+          currentShiftSearchPhones[p] = true;
+        }
+      }
+
       return true;
     });
   });
 
-  var GAS_FALLBACK_URL = 'https://script.google.com/macros/s/AKfycbx2Zrd2LpjMwEEdPwIkr3IvAB83qhJmdbHbkY4kaIC8EecbX872VV0UN1qUZxpqs4zUkA/exec';
+  var currentShiftSearchPhones = {};
+    var GAS_FALLBACK_URL = 'https://script.google.com/macros/s/AKfycbx2Zrd2LpjMwEEdPwIkr3IvAB83qhJmdbHbkY4kaIC8EecbX872VV0UN1qUZxpqs4zUkA/exec';
 
   function callGasApi(action, successCb, failCb) {
     if (typeof google !== 'undefined' && google.script && google.script.run) {
