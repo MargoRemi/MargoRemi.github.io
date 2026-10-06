@@ -7995,7 +7995,10 @@
         row[COL_STORE] = cleanStoreNumber(row[COL_STORE]);
       }
     });
-    analysisSetSource('needs', headers, rows);
+    var analysisRows = rows.filter(function(r) {
+      return (r[COL_STATUS] || '').toString().trim().toLowerCase() === 'актуально';
+    });
+    analysisSetSource('needs', headers, analysisRows);
 
     var theadHtml = '<tr>';
     headers.forEach(function(header, index) { 
