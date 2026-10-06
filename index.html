@@ -4767,7 +4767,7 @@
         return p ? ('Приоритет ' + p) : 'Обычный';
       });
       addDimension('format', 'Формат', function(row) { return row[COL_FORMAT]; });
-      addSumMetric('people', 'Требуется людей', function(row) { return cleanVal(row[COL_PEOPLE_COUNT]) || 1; });
+      addSumMetric('people', 'Требуется людей', function(row) { return cleanVal(row[COL_PEOPLE_COUNT]); });
       addAverageMetric('rate', 'Средняя итоговая оплата', function(row) { return cleanVal(row[18]); });
     } else if (sourceId === 'shift') {
       addDimension('city', 'Город', function(row) { return row[3]; });
@@ -5042,7 +5042,7 @@
       var isPrio1 = prioStr.indexOf('1') !== -1;
       var isPrio2 = prioStr.indexOf('2') !== -1;
       var isPrio3 = prioStr.indexOf('3') !== -1;
-      var vac = cleanVal(row[COL_PEOPLE_COUNT]) || 1;
+      var vac = cleanVal(row[COL_PEOPLE_COUNT]);
       grandTotalVacancies += vac;
 
       // 1. По городам
@@ -6203,7 +6203,7 @@
           var cNorm = normalizeText(rawCity);
           if (!cNorm) return;
           if (!cityLabelMap[cNorm]) cityLabelMap[cNorm] = rawCity;
-          planCity[cNorm] = (planCity[cNorm] || 0) + (cleanVal(row[COL_PEOPLE_COUNT]) || 1);
+          planCity[cNorm] = (planCity[cNorm] || 0) + (cleanVal(row[COL_PEOPLE_COUNT]));
         });
       }
       var factCity = {};
@@ -6255,7 +6255,7 @@
           var pCanon = canonicalPosition(rawPos);
           if (!pCanon) return;
           if (!posLabelMap[pCanon]) posLabelMap[pCanon] = rawPos;
-          planPos[pCanon] = (planPos[pCanon] || 0) + (cleanVal(row[COL_PEOPLE_COUNT]) || 1);
+          planPos[pCanon] = (planPos[pCanon] || 0) + (cleanVal(row[COL_PEOPLE_COUNT]));
         });
       }
       var factPos = {};
@@ -7504,7 +7504,7 @@
       var cNorm = normalizeText(rawCity);
       if (!cNorm) return;
       if (!cityLabelMap[cNorm]) cityLabelMap[cNorm] = rawCity;
-      var p = cleanVal(row[COL_PEOPLE_COUNT]) || 1;
+      var p = cleanVal(row[COL_PEOPLE_COUNT]);
       planCity[cNorm] = (planCity[cNorm] || 0) + p;
     });
 
@@ -7605,7 +7605,7 @@
       var cNorm = normalizeText(rawCity);
       if (!cNorm) return;
       if (!cityLabelMap[cNorm]) cityLabelMap[cNorm] = rawCity;
-      var p = cleanVal(row[COL_PEOPLE_COUNT]) || 1;
+      var p = cleanVal(row[COL_PEOPLE_COUNT]);
       planCity[cNorm] = (planCity[cNorm] || 0) + p;
     });
 
@@ -7707,7 +7707,7 @@
       var pCanon = canonicalPosition(rawPos);
       if (!pCanon) return;
       if (!posLabelMap[pCanon]) posLabelMap[pCanon] = rawPos;
-      var p = cleanVal(row[COL_PEOPLE_COUNT]) || 1;
+      var p = cleanVal(row[COL_PEOPLE_COUNT]);
       planPos[pCanon] = (planPos[pCanon] || 0) + p;
     });
 
