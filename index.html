@@ -3619,6 +3619,7 @@
                   <div class="btn-group btn-group-sm" role="group">
                     <button type="button" class="btn btn-outline-primary active fw-semibold btn-mode-toggle" id="rec-w-btn-mode-all">Неделя общая (по людям)</button>
                     <button type="button" class="btn btn-outline-primary fw-semibold btn-mode-toggle" id="rec-w-btn-mode-days">По дням (все смены)</button>
+                    <button type="button" class="btn btn-outline-primary fw-semibold btn-mode-toggle" id="rec-w-btn-mode-compare">⚖️ Сравнение 2 периодов</button>
                   </div>
                 </div>
               </div>
@@ -3630,7 +3631,7 @@
                   <div class="col-md-2 col-sm-4 col-6"><div class="filter-label">Город</div><div id="filter-rec-w-city"></div></div>
                   <div class="col-md-2 col-sm-4 col-6"><div class="filter-label">СВ</div><div id="filter-rec-w-sv"></div></div>
                   <div class="col-md-3 col-sm-6 col-6"><div class="filter-label">Специальность</div><div id="filter-rec-w-spec"></div></div>
-                  <div class="col-md-3 col-sm-6 col-12">
+                  <div id="rec-w-standard-date-col" class="col-md-3 col-sm-6 col-12">
                     <div class="filter-label">Дата (От и До)</div>
                     <div class="d-flex gap-1">
                       <input type="date" id="filter-rec-w-date-from" class="form-control form-control-sm input-compact">
@@ -3639,7 +3640,62 @@
                       <button class="btn btn-sm btn-outline-secondary btn-compact" id="clear-rec-w-dates" title="Сбросить">✕</button>
                     </div>
                   </div>
+                  <div id="rec-w-compare-date-col" class="col-12" style="display: none;">
+                    <div class="p-2 rounded-3" style="background: rgba(0, 113, 227, 0.05); border: 1px solid rgba(0, 113, 227, 0.2);">
+                      <div class="row g-2 align-items-end">
+                        <div class="col-12 col-md-5">
+                          <div class="filter-label text-primary" style="font-size: 0.74rem; font-weight: 700;">📅 Период 1 (Базовый / Прошлый)</div>
+                          <div class="d-flex gap-1 align-items-center">
+                            <input type="date" id="filter-rec-w-p1-from" class="form-control form-control-sm input-compact" title="Период 1: Дата от">
+                            <span class="text-muted">—</span>
+                            <input type="date" id="filter-rec-w-p1-to" class="form-control form-control-sm input-compact" title="Период 1: Дата до">
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-5">
+                          <div class="filter-label text-success" style="font-size: 0.74rem; font-weight: 700;">📅 Период 2 (Сравниваемый / Текущий)</div>
+                          <div class="d-flex gap-1 align-items-center">
+                            <input type="date" id="filter-rec-w-p2-from" class="form-control form-control-sm input-compact" title="Период 2: Дата от">
+                            <span class="text-muted">—</span>
+                            <input type="date" id="filter-rec-w-p2-to" class="form-control form-control-sm input-compact" title="Период 2: Дата до">
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-2">
+                          <button type="button" class="btn btn-sm btn-outline-secondary w-100 btn-compact" id="clear-rec-w-compare-dates" title="Сбросить даты сравнения">Сбросить</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              <div id="rec-w-view-compare" class="table-responsive" style="display: none;">
+                <table id="tableRecWeeklyCompare" class="table table-hover table-bordered align-middle">
+                  <thead>
+                    <tr>
+                      <th class="text-center" rowspan="2">Телефон</th>
+                      <th class="text-center" rowspan="2">ФИО</th>
+                      <th class="text-center" rowspan="2">Номер ТК</th>
+                      <th class="text-center" rowspan="2">Город</th>
+                      <th class="text-center" rowspan="2">Специальность</th>
+                      <th class="text-center" colspan="3" style="background: rgba(0, 113, 227, 0.08); border-bottom: 2px solid var(--ios-blue);">Период 1</th>
+                      <th class="text-center" colspan="3" style="background: rgba(52, 199, 89, 0.08); border-bottom: 2px solid var(--ios-green);">Период 2</th>
+                      <th class="text-center" colspan="4" style="background: rgba(255, 149, 0, 0.08); border-bottom: 2px solid var(--ios-orange);">Сравнение (Динамика)</th>
+                    </tr>
+                    <tr>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(0, 113, 227, 0.04);">Смен</th>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(0, 113, 227, 0.04);">Часов</th>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(0, 113, 227, 0.04);">Выплата</th>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(52, 199, 89, 0.04);">Смен</th>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(52, 199, 89, 0.04);">Часов</th>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(52, 199, 89, 0.04);">Выплата</th>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(255, 149, 0, 0.04);">Смен (±)</th>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(255, 149, 0, 0.04);">Часов (±)</th>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(255, 149, 0, 0.04);">ФОТ (± ₽)</th>
+                      <th class="text-center" style="font-size: 0.74rem; background: rgba(255, 149, 0, 0.04);">Динамика</th>
+                    </tr>
+                  </thead>
+                  <tbody id="body-rec-w-compare"></tbody>
+                </table>
               </div>
 
               <div id="rec-w-view-summary" class="table-responsive">
@@ -3830,7 +3886,7 @@
 
   let dtNeeds = null, dtShift = null, dtTariffs = null;
   let dtRecDailyDays = null, dtRecDailySummary = null;
-  let dtRecWeeklyDays = null, dtRecWeeklySummary = null;
+  let dtRecWeeklyDays = null, dtRecWeeklySummary = null, dtRecWeeklyCompare = null;
   let allDailyRecords = [], allWeeklyRecords = [];
   var analysisSources = {};
   var analysisCharts = {};
@@ -4444,6 +4500,7 @@
     recalcTableSafely(dtRecDailySummary);
     recalcTableSafely(dtRecWeeklyDays);
     recalcTableSafely(dtRecWeeklySummary);
+    recalcTableSafely(dtRecWeeklyCompare);
   }
 
   // Встроенный языковой пакет DataTables (устраняет асинхронную задержку загрузки с CDN)
@@ -9492,20 +9549,69 @@
       applyWeeklyFilters();
     });
 
+    // Инициализация дат для сравнения периодов (последние 2 недели) по умолчанию
+    function initDefaultCompareDates() {
+      if ($('#filter-rec-w-p1-from').val() || $('#filter-rec-w-p2-to').val()) return;
+      var timestamps = [];
+      allWeeklyRecords.forEach(function(r) {
+        if (r.date) {
+          var ts = parseDateForSort(r.date);
+          if (ts) timestamps.push(ts);
+        }
+      });
+      if (timestamps.length) {
+        timestamps.sort(function(a, b) { return a - b; });
+        var maxTs = timestamps[timestamps.length - 1];
+        var maxD = new Date(maxTs);
+        var p2To = maxD.toISOString().slice(0, 10);
+        var p2FromD = new Date(maxTs - 6 * 86400000);
+        var p2From = p2FromD.toISOString().slice(0, 10);
+        var p1ToD = new Date(maxTs - 7 * 86400000);
+        var p1To = p1ToD.toISOString().slice(0, 10);
+        var p1FromD = new Date(maxTs - 13 * 86400000);
+        var p1From = p1FromD.toISOString().slice(0, 10);
+
+        $('#filter-rec-w-p2-to').val(p2To);
+        $('#filter-rec-w-p2-from').val(p2From);
+        $('#filter-rec-w-p1-to').val(p1To);
+        $('#filter-rec-w-p1-from').val(p1From);
+      }
+    }
+
     function switchWeeklyMode(mode) {
       sessionStorage.setItem('remi_rec_w_mode', mode);
       if (mode === 'days') {
         $('#rec-w-btn-mode-days').addClass('active');
         $('#rec-w-btn-mode-all').removeClass('active');
+        $('#rec-w-btn-mode-compare').removeClass('active');
         $('#rec-w-view-summary').hide();
+        $('#rec-w-view-compare').hide();
         $('#rec-w-view-days').show();
+        $('#rec-w-compare-date-col').hide();
+        $('#rec-w-standard-date-col').show();
         $('#rec-w-title-count').text('Смен за неделю');
         setTimeout(function() { recalcTableSafely(dtRecWeeklyDays); }, 50);
+      } else if (mode === 'compare') {
+        $('#rec-w-btn-mode-compare').addClass('active');
+        $('#rec-w-btn-mode-all').removeClass('active');
+        $('#rec-w-btn-mode-days').removeClass('active');
+        $('#rec-w-view-summary').hide();
+        $('#rec-w-view-days').hide();
+        $('#rec-w-view-compare').show();
+        $('#rec-w-standard-date-col').hide();
+        $('#rec-w-compare-date-col').show();
+        $('#rec-w-title-count').text('Людей (П1 ➔ П2)');
+        initDefaultCompareDates();
+        setTimeout(function() { recalcTableSafely(dtRecWeeklyCompare); }, 50);
       } else {
         $('#rec-w-btn-mode-all').addClass('active');
         $('#rec-w-btn-mode-days').removeClass('active');
+        $('#rec-w-btn-mode-compare').removeClass('active');
         $('#rec-w-view-days').hide();
+        $('#rec-w-view-compare').hide();
         $('#rec-w-view-summary').show();
+        $('#rec-w-compare-date-col').hide();
+        $('#rec-w-standard-date-col').show();
         $('#rec-w-title-count').text('Людей за неделю');
         setTimeout(function() { recalcTableSafely(dtRecWeeklySummary); }, 50);
       }
@@ -9514,6 +9620,13 @@
 
     $('#rec-w-btn-mode-all').off('click').on('click', function() { switchWeeklyMode('summary'); });
     $('#rec-w-btn-mode-days').off('click').on('click', function() { switchWeeklyMode('days'); });
+    $('#rec-w-btn-mode-compare').off('click').on('click', function() { switchWeeklyMode('compare'); });
+
+    $('#filter-rec-w-p1-from, #filter-rec-w-p1-to, #filter-rec-w-p2-from, #filter-rec-w-p2-to').off('change').on('change', debouncedApplyWeeklyFilters);
+    $('#clear-rec-w-compare-dates').off('click').on('click', function() {
+      $('#filter-rec-w-p1-from, #filter-rec-w-p1-to, #filter-rec-w-p2-from, #filter-rec-w-p2-to').val('');
+      applyWeeklyFilters();
+    });
 
     var savedMode = sessionStorage.getItem('remi_rec_w_mode') || 'summary';
     switchWeeklyMode(savedMode);
@@ -9529,10 +9642,197 @@
   }
 
   function applyWeeklyFilters() {
-    var filtered = filterRecords(allWeeklyRecords, '#filter-rec-w-store', '#filter-rec-w-city', '#filter-rec-w-sv', '#filter-rec-w-spec', '#filter-rec-w-date-from', '#filter-rec-w-date-to');
-    renderSummaryTable(filtered, '#tableRecWeeklySummary', '#body-rec-w-summary', dtRecWeeklySummary, function(dt) { dtRecWeeklySummary = dt; });
-    renderDaysTable(filtered, '#tableRecWeeklyDays', '#body-rec-w-days', dtRecWeeklyDays, function(dt) { dtRecWeeklyDays = dt; });
-    updateTotals(filtered, '#rec-w-total-rows', '#rec-w-total-hours', '#rec-w-total-payout', $('#rec-w-btn-mode-days').hasClass('active'));
+    var mode = sessionStorage.getItem('remi_rec_w_mode') || 'summary';
+    if (mode === 'compare') {
+      applyWeeklyCompareFilters();
+    } else {
+      var filtered = filterRecords(allWeeklyRecords, '#filter-rec-w-store', '#filter-rec-w-city', '#filter-rec-w-sv', '#filter-rec-w-spec', '#filter-rec-w-date-from', '#filter-rec-w-date-to');
+      renderSummaryTable(filtered, '#tableRecWeeklySummary', '#body-rec-w-summary', dtRecWeeklySummary, function(dt) { dtRecWeeklySummary = dt; });
+      renderDaysTable(filtered, '#tableRecWeeklyDays', '#body-rec-w-days', dtRecWeeklyDays, function(dt) { dtRecWeeklyDays = dt; });
+      updateTotals(filtered, '#rec-w-total-rows', '#rec-w-total-hours', '#rec-w-total-payout', $('#rec-w-btn-mode-days').hasClass('active'));
+    }
+  }
+
+  function applyWeeklyCompareFilters() {
+    var filteredP1 = filterRecords(allWeeklyRecords, '#filter-rec-w-store', '#filter-rec-w-city', '#filter-rec-w-sv', '#filter-rec-w-spec', '#filter-rec-w-p1-from', '#filter-rec-w-p1-to');
+    var filteredP2 = filterRecords(allWeeklyRecords, '#filter-rec-w-store', '#filter-rec-w-city', '#filter-rec-w-sv', '#filter-rec-w-spec', '#filter-rec-w-p2-from', '#filter-rec-w-p2-to');
+    renderCompareTable(filteredP1, filteredP2, '#tableRecWeeklyCompare', '#body-rec-w-compare', dtRecWeeklyCompare, function(dt) { dtRecWeeklyCompare = dt; });
+  }
+
+  // Отрисовка таблицы «Сравнение 2 периодов» (по исполнителям)
+  function renderCompareTable(recordsP1, recordsP2, tableId, bodyId, dtInstance, setDtCallback) {
+    var peopleMap = {};
+
+    function ensurePerson(item) {
+      var pKey = item.phone !== '-' ? item.phone : item.fio;
+      if (!peopleMap[pKey]) {
+        peopleMap[pKey] = {
+          phone: item.phone,
+          fio: item.fio,
+          tkSet: new Set(),
+          citySet: new Set(),
+          specSet: new Set(),
+          p1: { shifts: 0, hours: 0, payout: 0 },
+          p2: { shifts: 0, hours: 0, payout: 0 }
+        };
+      }
+      if (item.tk) peopleMap[pKey].tkSet.add(item.tk);
+      if (item.city) peopleMap[pKey].citySet.add(item.city);
+      if (item.spec) peopleMap[pKey].specSet.add(item.spec);
+      return peopleMap[pKey];
+    }
+
+    recordsP1.forEach(function(item) {
+      var p = ensurePerson(item);
+      p.p1.shifts++;
+      p.p1.hours += (item.hours || 0);
+      p.p1.payout += (item.payout || 0);
+    });
+
+    recordsP2.forEach(function(item) {
+      var p = ensurePerson(item);
+      p.p2.shifts++;
+      p.p2.hours += (item.hours || 0);
+      p.p2.payout += (item.payout || 0);
+    });
+
+    var dataset = [];
+    var totalP1 = { count: 0, hours: 0, payout: 0 };
+    var totalP2 = { count: 0, hours: 0, payout: 0 };
+
+    Object.keys(peopleMap).forEach(function(k) {
+      var p = peopleMap[k];
+      var s1 = p.p1.shifts, s2 = p.p2.shifts;
+      var h1 = Math.round(p.p1.hours * 10) / 10, h2 = Math.round(p.p2.hours * 10) / 10;
+      var pay1 = Math.round(p.p1.payout), pay2 = Math.round(p.p2.payout);
+
+      if (s1 > 0) { totalP1.count++; totalP1.hours += h1; totalP1.payout += pay1; }
+      if (s2 > 0) { totalP2.count++; totalP2.hours += h2; totalP2.payout += pay2; }
+
+      var deltaShifts = s2 - s1;
+      var deltaHours = Math.round((h2 - h1) * 10) / 10;
+      var deltaPayout = pay2 - pay1;
+
+      var deltaShiftsHtml = '';
+      if (deltaShifts > 0) {
+        deltaShiftsHtml = '<span class="text-success fw-bold" data-sort="' + deltaShifts + '">+' + deltaShifts + '</span>';
+      } else if (deltaShifts < 0) {
+        deltaShiftsHtml = '<span class="text-danger fw-bold" data-sort="' + deltaShifts + '">' + deltaShifts + '</span>';
+      } else {
+        deltaShiftsHtml = '<span class="text-muted" data-sort="0">0</span>';
+      }
+
+      var deltaHoursHtml = '';
+      if (deltaHours > 0) {
+        deltaHoursHtml = '<span class="text-success fw-bold" data-sort="' + deltaHours + '">+' + deltaHours + ' ч.</span>';
+      } else if (deltaHours < 0) {
+        deltaHoursHtml = '<span class="text-danger fw-bold" data-sort="' + deltaHours + '">' + deltaHours + ' ч.</span>';
+      } else {
+        deltaHoursHtml = '<span class="text-muted" data-sort="0">0 ч.</span>';
+      }
+
+      var deltaPayoutHtml = '';
+      if (deltaPayout > 0) {
+        deltaPayoutHtml = '<span class="badge text-bg-success" style="font-size:0.8rem;" data-sort="' + deltaPayout + '">+' + deltaPayout.toLocaleString('ru-RU') + ' ₽</span>';
+      } else if (deltaPayout < 0) {
+        deltaPayoutHtml = '<span class="badge text-bg-danger" style="font-size:0.8rem;" data-sort="' + deltaPayout + '">' + deltaPayout.toLocaleString('ru-RU') + ' ₽</span>';
+      } else {
+        deltaPayoutHtml = '<span class="badge text-bg-secondary" style="font-size:0.8rem;" data-sort="0">0 ₽</span>';
+      }
+
+      var statusBadge = '';
+      var pctSort = 0;
+      if (s1 === 0 && s2 > 0) {
+        statusBadge = '<span class="badge text-bg-primary">✨ Новый</span>';
+        pctSort = 99999;
+      } else if (s1 > 0 && s2 === 0) {
+        statusBadge = '<span class="badge text-bg-secondary">💤 Не выходил</span>';
+        pctSort = -99999;
+      } else if (pay1 > 0) {
+        var pct = Math.round((deltaPayout / pay1) * 100);
+        pctSort = pct;
+        if (pct > 0) {
+          statusBadge = '<span class="badge text-bg-success">▲ +' + pct + '%</span>';
+        } else if (pct < 0) {
+          statusBadge = '<span class="badge text-bg-danger">▼ ' + pct + '%</span>';
+        } else {
+          statusBadge = '<span class="badge text-bg-light text-muted">= 0%</span>';
+        }
+      } else {
+        statusBadge = '<span class="text-muted">—</span>';
+      }
+
+      dataset.push([
+        escapeHtml(p.phone),
+        escapeHtml(p.fio),
+        escapeHtml(Array.from(p.tkSet).join(', ')),
+        escapeHtml(Array.from(p.citySet).join(', ')),
+        escapeHtml(Array.from(p.specSet).join(', ')),
+        // П1
+        '<span data-sort="' + s1 + '">' + s1 + '</span>',
+        '<span data-sort="' + h1 + '">' + h1 + ' ч.</span>',
+        '<span data-sort="' + pay1 + '">' + pay1.toLocaleString('ru-RU') + ' ₽</span>',
+        // П2
+        '<span data-sort="' + s2 + '">' + s2 + '</span>',
+        '<span data-sort="' + h2 + '">' + h2 + ' ч.</span>',
+        '<span class="fw-bold" data-sort="' + pay2 + '">' + pay2.toLocaleString('ru-RU') + ' ₽</span>',
+        // Динамика
+        deltaShiftsHtml,
+        deltaHoursHtml,
+        deltaPayoutHtml,
+        '<span data-sort="' + pctSort + '">' + statusBadge + '</span>'
+      ]);
+    });
+
+    // Update Totals Header
+    var diffCount = totalP2.count - totalP1.count;
+    var diffHours = Math.round((totalP2.hours - totalP1.hours) * 10) / 10;
+    var diffPayout = totalP2.payout - totalP1.payout;
+
+    var signC = diffCount >= 0 ? '+' : '';
+    var signH = diffHours >= 0 ? '+' : '';
+    var signP = diffPayout >= 0 ? '+' : '';
+
+    var colorC = diffCount > 0 ? 'var(--ios-green)' : (diffCount < 0 ? 'var(--ios-red)' : 'var(--ios-text)');
+    var colorH = diffHours > 0 ? 'var(--ios-green)' : (diffHours < 0 ? 'var(--ios-red)' : 'var(--ios-blue)');
+    var colorP = diffPayout > 0 ? 'var(--ios-green)' : (diffPayout < 0 ? 'var(--ios-red)' : 'var(--ios-orange)');
+
+    $('#rec-w-total-rows').html(totalP1.count + ' ➔ ' + totalP2.count + ' <span style="font-size:0.75rem; color:' + colorC + '">(' + signC + diffCount + ')</span>');
+    $('#rec-w-total-hours').html(Math.round(totalP1.hours) + ' ➔ ' + Math.round(totalP2.hours) + ' <span style="font-size:0.75rem; color:' + colorH + '">(' + signH + diffHours + ' ч.)</span>');
+    $('#rec-w-total-payout').html(totalP1.payout.toLocaleString('ru-RU') + ' ➔ ' + totalP2.payout.toLocaleString('ru-RU') + ' ₽<br><span style="font-size:0.75rem; color:' + colorP + '">(' + signP + diffPayout.toLocaleString('ru-RU') + ' ₽)</span>');
+
+    var dt = dtInstance;
+    if (!dt && $.fn.dataTable.isDataTable(tableId)) {
+      dt = $(tableId).DataTable();
+    }
+
+    if (dt) {
+      dt.clear().rows.add(dataset).draw(false);
+      recalcTableSafely(dt);
+      setDtCallback(dt);
+      makeTableResizable(tableId);
+      return;
+    }
+
+    var newDt = $(tableId).DataTable({
+      autoWidth: false,
+      language: DT_RU_LANG,
+      pageLength: 25,
+      data: dataset,
+      order: [[13, 'desc']], // Сортировка по разнице выплат (ФОТ)
+      responsive: false,
+      columnDefs: [
+        { targets: 0, className: 'text-center fw-semibold' },
+        { targets: 1, className: 'text-start' },
+        { targets: [2, 3, 4], className: 'text-center' },
+        { targets: [5, 6, 7], className: 'text-center' },
+        { targets: [8, 9, 10], className: 'text-center' },
+        { targets: [11, 12, 13, 14], className: 'text-center' }
+      ]
+    });
+    setDtCallback(newDt);
+    recalcTableSafely(newDt);
+    makeTableResizable(tableId);
   }
 
   // Общая функция фильтрации объектов в памяти
