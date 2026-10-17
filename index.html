@@ -2654,6 +2654,7 @@
               <input class="form-check-input mt-0" type="checkbox" id="analysis-unique-phone" style="width: 15px; height: 15px;">
               <label class="form-check-label filter-label" for="analysis-unique-phone" style="text-transform:none; margin-bottom:0; font-size: 0.75rem;">Без дублей (по тел.)</label>
             </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" id="analysis-clear-dates" title="Сбросить даты аналитики" style="font-size: 0.72rem; padding: 2px 8px; height: 28px; border-radius: 6px;">Сбросить даты</button>
           </div>
 
         <!-- 1. ПОТРЕБНОСТИ -->
@@ -3830,6 +3831,30 @@
         return true;
       });
     }
+
+    function filterReconcileRecordsForAnalytics(records) {
+      if (!records || !records.length) return [];
+      var fromStr = $('#analysis-date-from').val();
+      var toStr = $('#analysis-date-to').val();
+      if (!fromStr && !toStr) return records;
+
+      var fromTs = fromStr ? parseDateForSort(fromStr.split('-').reverse().join('.')) : null;
+      var toTs = toStr ? parseDateForSort(toStr.split('-').reverse().join('.') + ' 23:59:59') : null;
+
+      return records.filter(function(item) {
+        if (!item || !item.date) return false;
+        var ts = parseDateForSort(item.date);
+        if (!ts) return false;
+        if (fromTs && ts < fromTs) return false;
+        if (toTs && ts > toTs) return false;
+        return true;
+      });
+    }
+
+    function getReconcileRecordsForAnalytics() {
+      var rawList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+      return filterReconcileRecordsForAnalytics(rawList);
+    }
   let workedPersonsMap = {};
   let shiftFioColIdx = 4;
   let shiftPhoneColIdx = SHIFT_PHONE_COL;
@@ -4811,7 +4836,13 @@
       addAverageMetric('tariff', 'Средний тариф', function(row) { return row.tariff; });
     }
 
-    return { rows: source.rows, dimensions: dimensions, metrics: metrics };
+    var sRows = source.rows;
+    if (sourceId === 'shift') {
+      sRows = filterShiftRowsForAnalytics(sRows);
+    } else if (sourceId === 'daily' || sourceId === 'weekly') {
+      sRows = filterReconcileRecordsForAnalytics(sRows);
+    }
+    return { rows: sRows, dimensions: dimensions, metrics: metrics };
   }
 
   function analysisFindById(items, itemId) {
@@ -5116,7 +5147,8 @@
     // 5. Баланс с рекрутингом 1 смены
     var shiftCityMap = {};
     if (analysisSources['shift'] && analysisSources['shift'].rows) {
-      analysisSources['shift'].rows.forEach(function(r) {
+      var shiftFilteredRows = filterShiftRowsForAnalytics(analysisSources['shift'].rows);
+      shiftFilteredRows.forEach(function(r) {
         var cRaw = (r[3] || '').toString().trim();
         var cNorm = normalizeText(cRaw);
         if (!cNorm) return;
@@ -6068,7 +6100,7 @@
     } else if (chartId === 'analysis-reconcile-city-payout' || chartId === 'analysis-reconcile-city-hours') {
       $title.text('Финансовые показатели и отработанные часы по городам');
       $sub.text('Сводный отчет по фонду оплаты (ФОТ), количеству смен и отработанным часам');
-      var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+      var recList = getReconcileRecordsForAnalytics();
       var cMap = {}, grandPay = 0, grandHrs = 0;
       if (recList && recList.length) {
         recList.forEach(function(r) {
@@ -6111,7 +6143,7 @@
     } else if (chartId === 'analysis-reconcile-top-stores') {
       $title.text('ТОП магазинов сети по фонду выплат (ФОТ)');
       $sub.text('Рейтинг торговых комплексов с наибольшими затратами на персонал');
-      var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+      var recList = getReconcileRecordsForAnalytics();
       var stMap = {};
       if (recList && recList.length) {
         recList.forEach(function(r) {
@@ -6207,7 +6239,7 @@
         });
       }
       var factCity = {};
-      var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+      var recList = getReconcileRecordsForAnalytics();
       if (recList && recList.length) {
         recList.forEach(function(r) {
           var rawCity = (r.city || '').toString().trim();
@@ -6259,7 +6291,7 @@
         });
       }
       var factPos = {};
-      var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+      var recList = getReconcileRecordsForAnalytics();
       if (recList && recList.length) {
         recList.forEach(function(r) {
           var pCanon = canonicalPosition((r.spec || '').toString().trim());
@@ -6764,7 +6796,7 @@
     var canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return;
 
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     if (!recList || !recList.length) return;
 
     var dateMap = {};
@@ -6776,9 +6808,13 @@
       dateMap[dStr].count++;
     });
 
+    var isDateFiltered = !!($('#analysis-date-from').val() || $('#analysis-date-to').val());
     var sortedDates = Object.keys(dateMap).sort(function(a, b) {
       return (parseDateForSort(a) || 0) - (parseDateForSort(b) || 0);
-    }).slice(-25);
+    });
+    if (!isDateFiltered) {
+      sortedDates = sortedDates.slice(-30);
+    }
 
     if (!sortedDates.length) return;
 
@@ -6835,7 +6871,7 @@
     var canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return;
 
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     if (!recList || !recList.length) return;
 
     var cityMap = {};
@@ -6916,7 +6952,7 @@
     var canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return;
 
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     if (!recList || !recList.length) return;
 
     var cityMap = {};
@@ -6995,7 +7031,7 @@
     var canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return;
 
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     if (!recList || !recList.length) return;
 
     var specMap = {};
@@ -7075,7 +7111,7 @@
     var canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return;
 
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     if (!recList || !recList.length) return;
 
     var storeMap = {};
@@ -7154,7 +7190,7 @@
     var canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return;
 
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     if (!recList || !recList.length) return;
 
     var typeMap = {};
@@ -7392,7 +7428,7 @@
     var canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return;
 
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     var storeRateMap = {};
 
     if (recList && recList.length) {
@@ -7509,7 +7545,7 @@
     });
 
     var factCity = {};
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     if (recList && recList.length) {
       recList.forEach(function(r) {
         var rawCity = (r.city || '').toString().trim();
@@ -7610,7 +7646,7 @@
     });
 
     var factCity = {};
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     if (recList && recList.length) {
       recList.forEach(function(r) {
         var rawCity = (r.city || '').toString().trim();
@@ -7712,7 +7748,7 @@
     });
 
     var factPos = {};
-    var recList = (allDailyRecords && allDailyRecords.length) ? allDailyRecords : allWeeklyRecords;
+    var recList = getReconcileRecordsForAnalytics();
     if (recList && recList.length) {
       recList.forEach(function(r) {
         var rawSpec = (r.spec || '').toString().trim();
@@ -7887,6 +7923,11 @@
       refreshAnalysisCharts();
     });
       $('#analysis-date-from, #analysis-date-to, #analysis-unique-phone').on('change', refreshAnalysisCharts);
+      $('#analysis-clear-dates').on('click', function() {
+        $('#analysis-date-from').val('');
+        $('#analysis-date-to').val('');
+        refreshAnalysisCharts();
+      });
       $('#shift-unique-phone').on('change', function() { if (dtShift) dtShift.draw(); });
 
     $(document).off('click', '.btn-analysis-fullscreen').on('click', '.btn-analysis-fullscreen', function() {
