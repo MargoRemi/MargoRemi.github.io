@@ -544,10 +544,10 @@
     }
     .filter-label { 
       font-weight: 700; 
-      font-size: 0.68rem; 
+      font-size: 0.74rem; 
       color: var(--ios-text-muted); 
       text-transform: uppercase; 
-      letter-spacing: 0.06em; 
+      letter-spacing: 0.05em; 
       margin-bottom: 5px; 
     }
     
@@ -814,8 +814,43 @@
       cursor: pointer !important;
     }
     input[type="date"].input-compact {
-      padding: 4px 6px !important;
-      font-size: 0.79rem !important;
+      height: 38px !important;
+      padding: 4px 10px !important;
+      font-size: 0.88rem !important;
+      font-weight: 500;
+      flex: 1 1 0%;
+      min-width: 0;
+    }
+
+    #clear-s-dates,
+    #clear-rec-d-dates,
+    #clear-rec-w-dates {
+      width: 38px !important;
+      min-width: 38px !important;
+      height: 38px !important;
+      padding: 0 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 1rem !important;
+      flex-shrink: 0;
+      border-radius: 10px !important;
+    }
+
+    @media (max-width: 576px) {
+      input[type="date"].input-compact {
+        height: 42px !important;
+        font-size: 0.94rem !important;
+        padding: 6px 10px !important;
+      }
+      #clear-s-dates,
+      #clear-rec-d-dates,
+      #clear-rec-w-dates {
+        width: 42px !important;
+        min-width: 42px !important;
+        height: 42px !important;
+        font-size: 1.15rem !important;
+      }
     }
 
     /* Фирменные iOS бейджи и кнопки управления */
@@ -2469,7 +2504,7 @@
                   <option value="not_worked">❌ Не отработал</option>
                 </select>
               </div>
-              <div class="col-md-2 col-sm-4 col-6">
+              <div class="col-md-3 col-sm-6 col-12">
                 <div class="filter-label">Дата прихода</div>
                 <div class="d-flex gap-1">
                   <input type="date" id="filter-s-date-from" class="form-control form-control-sm input-compact" title="Дата от">
@@ -2643,12 +2678,12 @@
         </div>
           <div class="d-flex align-items-center gap-2 flex-wrap mb-3 analysis-extra-filters">
             <div class="d-flex align-items-center gap-1">
-              <span style="font-size: 0.75rem; color: var(--ios-text-secondary); font-weight: 500;">От:</span>
-              <input type="date" id="analysis-date-from" class="form-control input-compact" style="max-width: 120px; font-size: 0.75rem; height: 30px;">
+              <span style="font-size: 0.78rem; color: var(--ios-text-secondary); font-weight: 600;">От:</span>
+              <input type="date" id="analysis-date-from" class="form-control input-compact" style="min-width: 130px; font-size: 0.85rem; height: 36px;">
             </div>
             <div class="d-flex align-items-center gap-1">
-              <span style="font-size: 0.75rem; color: var(--ios-text-secondary); font-weight: 500;">До:</span>
-              <input type="date" id="analysis-date-to" class="form-control input-compact" style="max-width: 120px; font-size: 0.75rem; height: 30px;">
+              <span style="font-size: 0.78rem; color: var(--ios-text-secondary); font-weight: 600;">До:</span>
+              <input type="date" id="analysis-date-to" class="form-control input-compact" style="min-width: 130px; font-size: 0.85rem; height: 36px;">
             </div>
             <div class="form-check ms-2 d-flex align-items-center gap-1">
               <input class="form-check-input mt-0" type="checkbox" id="analysis-unique-phone" style="width: 15px; height: 15px;">
