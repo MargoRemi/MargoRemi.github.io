@@ -3668,34 +3668,120 @@
                 </div>
               </div>
 
-              <div id="rec-w-view-compare" class="table-responsive" style="display: none;">
-                <table id="tableRecWeeklyCompare" class="table table-hover table-bordered align-middle">
-                  <thead>
-                    <tr>
-                      <th class="text-center" rowspan="2">Телефон</th>
-                      <th class="text-center" rowspan="2">ФИО</th>
-                      <th class="text-center" rowspan="2">Номер ТК</th>
-                      <th class="text-center" rowspan="2">Город</th>
-                      <th class="text-center" rowspan="2">Специальность</th>
-                      <th class="text-center" colspan="3" style="background: rgba(0, 113, 227, 0.08); border-bottom: 2px solid var(--ios-blue);">Период 1</th>
-                      <th class="text-center" colspan="3" style="background: rgba(52, 199, 89, 0.08); border-bottom: 2px solid var(--ios-green);">Период 2</th>
-                      <th class="text-center" colspan="4" style="background: rgba(255, 149, 0, 0.08); border-bottom: 2px solid var(--ios-orange);">Сравнение (Динамика)</th>
-                    </tr>
-                    <tr>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(0, 113, 227, 0.04);">Смен</th>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(0, 113, 227, 0.04);">Часов</th>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(0, 113, 227, 0.04);">Выплата</th>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(52, 199, 89, 0.04);">Смен</th>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(52, 199, 89, 0.04);">Часов</th>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(52, 199, 89, 0.04);">Выплата</th>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(255, 149, 0, 0.04);">Смен (±)</th>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(255, 149, 0, 0.04);">Часов (±)</th>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(255, 149, 0, 0.04);">ФОТ (± ₽)</th>
-                      <th class="text-center" style="font-size: 0.74rem; background: rgba(255, 149, 0, 0.04);">Динамика</th>
-                    </tr>
-                  </thead>
-                  <tbody id="body-rec-w-compare"></tbody>
-                </table>
+              <!-- БЛОК СРАВНЕНИЯ 2 ПЕРИОДОВ С РАЗБИВКОЙ ПО СРЕЗАМ -->
+              <div id="rec-w-view-compare" style="display: none;">
+                <!-- Переключатель среза сравнения -->
+                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap" id="rec-w-compare-grouping-bar" style="background: var(--ios-card-bg); border: 1px solid var(--ios-input-border); border-radius: 12px; padding: 8px 12px;">
+                  <span class="text-muted fw-bold" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">Срез сравнения:</span>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-secondary active fw-semibold btn-compare-submode" id="btn-compare-group-people" data-group="people">👤 По людям</button>
+                    <button type="button" class="btn btn-outline-secondary fw-semibold btn-compare-submode" id="btn-compare-group-city" data-group="city">🏙️ По городам</button>
+                    <button type="button" class="btn btn-outline-secondary fw-semibold btn-compare-submode" id="btn-compare-group-tk" data-group="tk">🏪 По магазинам (ТК)</button>
+                    <button type="button" class="btn btn-outline-secondary fw-semibold btn-compare-submode" id="btn-compare-group-spec" data-group="spec">💼 По специальностям</button>
+                  </div>
+                </div>
+
+                <!-- 1. Срез: ПО ЛЮДЯМ -->
+                <div id="rec-w-compare-wrap-people" class="table-responsive">
+                  <table id="tableRecWeeklyComparePeople" class="table table-hover table-bordered align-middle">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Телефон</th>
+                        <th class="text-center">ФИО</th>
+                        <th class="text-center">Номер ТК</th>
+                        <th class="text-center">Город</th>
+                        <th class="text-center">Специальность</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Смен</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Часов</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Выплата</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Смен</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Часов</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Выплата</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Смен</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Часов</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);">Динамика</th>
+                      </tr>
+                    </thead>
+                    <tbody id="body-rec-w-compare-people"></tbody>
+                  </table>
+                </div>
+
+                <!-- 2. Срез: ПО ГОРОДАМ -->
+                <div id="rec-w-compare-wrap-city" class="table-responsive" style="display: none;">
+                  <table id="tableRecWeeklyCompareCity" class="table table-hover table-bordered align-middle">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Город</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Людей</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Смен</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Часов</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Людей</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Смен</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Часов</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Людей</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Смен</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Часов</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);">Динамика</th>
+                      </tr>
+                    </thead>
+                    <tbody id="body-rec-w-compare-city"></tbody>
+                  </table>
+                </div>
+
+                <!-- 3. Срез: ПО МАГАЗИНАМ (ТК) -->
+                <div id="rec-w-compare-wrap-tk" class="table-responsive" style="display: none;">
+                  <table id="tableRecWeeklyCompareTk" class="table table-hover table-bordered align-middle">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Номер ТК</th>
+                        <th class="text-center">Город</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Людей</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Смен</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Часов</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Людей</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Смен</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Часов</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Людей</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Смен</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Часов</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);">Динамика</th>
+                      </tr>
+                    </thead>
+                    <tbody id="body-rec-w-compare-tk"></tbody>
+                  </table>
+                </div>
+
+                <!-- 4. Срез: ПО СПЕЦИАЛЬНОСТЯМ -->
+                <div id="rec-w-compare-wrap-spec" class="table-responsive" style="display: none;">
+                  <table id="tableRecWeeklyCompareSpec" class="table table-hover table-bordered align-middle">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Специальность</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Людей</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Смен</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> Часов</th>
+                        <th class="text-center" style="background: rgba(0, 113, 227, 0.06);"><span class="badge text-bg-primary">П1</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Людей</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Смен</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> Часов</th>
+                        <th class="text-center" style="background: rgba(52, 199, 89, 0.06);"><span class="badge text-bg-success">П2</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Людей</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Смен</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> Часов</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);"><span class="badge text-bg-warning">±</span> ФОТ (₽)</th>
+                        <th class="text-center" style="background: rgba(255, 149, 0, 0.06);">Динамика</th>
+                      </tr>
+                    </thead>
+                    <tbody id="body-rec-w-compare-spec"></tbody>
+                  </table>
+                </div>
               </div>
 
               <div id="rec-w-view-summary" class="table-responsive">
@@ -3886,7 +3972,8 @@
 
   let dtNeeds = null, dtShift = null, dtTariffs = null;
   let dtRecDailyDays = null, dtRecDailySummary = null;
-  let dtRecWeeklyDays = null, dtRecWeeklySummary = null, dtRecWeeklyCompare = null;
+  let dtRecWeeklyDays = null, dtRecWeeklySummary = null;
+  let dtRecWeeklyComparePeople = null, dtRecWeeklyCompareCity = null, dtRecWeeklyCompareTk = null, dtRecWeeklyCompareSpec = null;
   let allDailyRecords = [], allWeeklyRecords = [];
   var analysisSources = {};
   var analysisCharts = {};
@@ -4188,7 +4275,7 @@
     var $table = $('#' + cleanId);
     if (!$table.length) return;
 
-    var $ths = $table.find('thead tr:first th');
+    var $ths = $table.find('thead tr:last th');
     var cssRules = [];
 
     $ths.each(function(idx) {
@@ -4232,7 +4319,7 @@
   }
 
   function applyAllSavedWidths() {
-    var ids = ['tableNeeds', 'tableShift', 'tableTariffs', 'tableRecDailyDays', 'tableRecDailySummary', 'tableRecWeeklyDays', 'tableRecWeeklySummary'];
+    var ids = ['tableNeeds', 'tableShift', 'tableTariffs', 'tableRecDailyDays', 'tableRecDailySummary', 'tableRecWeeklyDays', 'tableRecWeeklySummary', 'tableRecWeeklyComparePeople', 'tableRecWeeklyCompareCity', 'tableRecWeeklyCompareTk', 'tableRecWeeklyCompareSpec'];
     ids.forEach(function(id) {
       applySavedWidthsForTable(id);
     });
@@ -4245,7 +4332,7 @@
     if (!tableId) return;
     var storageKey = 'remi_col_width_' + tableId;
 
-    var $ths = $table.find('thead tr:first th');
+    var $ths = $table.find('thead tr:last th');
     if (!$ths.length) return;
 
     // Применяем сохраненные пользователем ширины (через динамические CSS-правила)
@@ -4500,7 +4587,10 @@
     recalcTableSafely(dtRecDailySummary);
     recalcTableSafely(dtRecWeeklyDays);
     recalcTableSafely(dtRecWeeklySummary);
-    recalcTableSafely(dtRecWeeklyCompare);
+    recalcTableSafely(dtRecWeeklyComparePeople);
+    recalcTableSafely(dtRecWeeklyCompareCity);
+    recalcTableSafely(dtRecWeeklyCompareTk);
+    recalcTableSafely(dtRecWeeklyCompareSpec);
   }
 
   // Встроенный языковой пакет DataTables (устраняет асинхронную задержку загрузки с CDN)
@@ -9578,6 +9668,26 @@
       }
     }
 
+    function switchCompareGroup(group) {
+      sessionStorage.setItem('remi_rec_w_compare_group', group);
+      $('.btn-compare-submode').removeClass('active');
+      $('#btn-compare-group-' + group).addClass('active');
+
+      $('#rec-w-compare-wrap-people').toggle(group === 'people');
+      $('#rec-w-compare-wrap-city').toggle(group === 'city');
+      $('#rec-w-compare-wrap-tk').toggle(group === 'tk');
+      $('#rec-w-compare-wrap-spec').toggle(group === 'spec');
+
+      applyWeeklyCompareFilters();
+
+      setTimeout(function() {
+        if (group === 'people') recalcTableSafely(dtRecWeeklyComparePeople);
+        else if (group === 'city') recalcTableSafely(dtRecWeeklyCompareCity);
+        else if (group === 'tk') recalcTableSafely(dtRecWeeklyCompareTk);
+        else if (group === 'spec') recalcTableSafely(dtRecWeeklyCompareSpec);
+      }, 50);
+    }
+
     function switchWeeklyMode(mode) {
       sessionStorage.setItem('remi_rec_w_mode', mode);
       if (mode === 'days') {
@@ -9602,7 +9712,8 @@
         $('#rec-w-compare-date-col').show();
         $('#rec-w-title-count').text('Людей (П1 ➔ П2)');
         initDefaultCompareDates();
-        setTimeout(function() { recalcTableSafely(dtRecWeeklyCompare); }, 50);
+        var curGroup = sessionStorage.getItem('remi_rec_w_compare_group') || 'people';
+        switchCompareGroup(curGroup);
       } else {
         $('#rec-w-btn-mode-all').addClass('active');
         $('#rec-w-btn-mode-days').removeClass('active');
@@ -9621,6 +9732,11 @@
     $('#rec-w-btn-mode-all').off('click').on('click', function() { switchWeeklyMode('summary'); });
     $('#rec-w-btn-mode-days').off('click').on('click', function() { switchWeeklyMode('days'); });
     $('#rec-w-btn-mode-compare').off('click').on('click', function() { switchWeeklyMode('compare'); });
+
+    $(document).off('click', '.btn-compare-submode').on('click', '.btn-compare-submode', function() {
+      var g = $(this).attr('data-group');
+      if (g) switchCompareGroup(g);
+    });
 
     $('#filter-rec-w-p1-from, #filter-rec-w-p1-to, #filter-rec-w-p2-from, #filter-rec-w-p2-to').off('change').on('change', debouncedApplyWeeklyFilters);
     $('#clear-rec-w-compare-dates').off('click').on('click', function() {
@@ -9653,141 +9769,54 @@
     }
   }
 
+  // Общие хелперы оформления дельт
+  function formatDeltaNum(val, unit, isInt) {
+    var num = isInt ? Math.round(val) : Math.round(val * 10) / 10;
+    var unitStr = unit ? (' ' + unit) : '';
+    if (num > 0) return '<span class="text-success fw-bold" data-sort="' + num + '">+' + num + unitStr + '</span>';
+    if (num < 0) return '<span class="text-danger fw-bold" data-sort="' + num + '">' + num + unitStr + '</span>';
+    return '<span class="text-muted" data-sort="0">0' + unitStr + '</span>';
+  }
+
+  function formatDeltaPayoutBadge(dPay) {
+    if (dPay > 0) return '<span class="badge text-bg-success" style="font-size:0.8rem;" data-sort="' + dPay + '">+' + dPay.toLocaleString('ru-RU') + ' ₽</span>';
+    if (dPay < 0) return '<span class="badge text-bg-danger" style="font-size:0.8rem;" data-sort="' + dPay + '">' + dPay.toLocaleString('ru-RU') + ' ₽</span>';
+    return '<span class="badge text-bg-secondary" style="font-size:0.8rem;" data-sort="0">0 ₽</span>';
+  }
+
+  function formatDynamicsBadge(v1, v2, dPay, isNewItem) {
+    if (isNewItem) return '<span class="badge text-bg-primary">✨ Новый</span>';
+    if (v1 > 0 && v2 === 0) return '<span class="badge text-bg-secondary">💤 Не выходил</span>';
+    if (v1 > 0) {
+      var pct = Math.round((dPay / v1) * 100);
+      if (pct > 0) return '<span class="badge text-bg-success">▲ +' + pct + '%</span>';
+      if (pct < 0) return '<span class="badge text-bg-danger">▼ ' + pct + '%</span>';
+      return '<span class="badge text-bg-light text-muted">= 0%</span>';
+    }
+    return '<span class="text-muted">—</span>';
+  }
+
   function applyWeeklyCompareFilters() {
     var filteredP1 = filterRecords(allWeeklyRecords, '#filter-rec-w-store', '#filter-rec-w-city', '#filter-rec-w-sv', '#filter-rec-w-spec', '#filter-rec-w-p1-from', '#filter-rec-w-p1-to');
     var filteredP2 = filterRecords(allWeeklyRecords, '#filter-rec-w-store', '#filter-rec-w-city', '#filter-rec-w-sv', '#filter-rec-w-spec', '#filter-rec-w-p2-from', '#filter-rec-w-p2-to');
-    renderCompareTable(filteredP1, filteredP2, '#tableRecWeeklyCompare', '#body-rec-w-compare', dtRecWeeklyCompare, function(dt) { dtRecWeeklyCompare = dt; });
+    var group = sessionStorage.getItem('remi_rec_w_compare_group') || 'people';
+
+    if (group === 'city') {
+      renderCompareGroupTable(filteredP1, filteredP2, 'city', '#tableRecWeeklyCompareCity', dtRecWeeklyCompareCity, function(dt) { dtRecWeeklyCompareCity = dt; });
+    } else if (group === 'tk') {
+      renderCompareGroupTable(filteredP1, filteredP2, 'tk', '#tableRecWeeklyCompareTk', dtRecWeeklyCompareTk, function(dt) { dtRecWeeklyCompareTk = dt; });
+    } else if (group === 'spec') {
+      renderCompareGroupTable(filteredP1, filteredP2, 'spec', '#tableRecWeeklyCompareSpec', dtRecWeeklyCompareSpec, function(dt) { dtRecWeeklyCompareSpec = dt; });
+    } else {
+      renderComparePeopleTable(filteredP1, filteredP2, '#tableRecWeeklyComparePeople', dtRecWeeklyComparePeople, function(dt) { dtRecWeeklyComparePeople = dt; });
+    }
   }
 
-  // Отрисовка таблицы «Сравнение 2 периодов» (по исполнителям)
-  function renderCompareTable(recordsP1, recordsP2, tableId, bodyId, dtInstance, setDtCallback) {
-    var peopleMap = {};
-
-    function ensurePerson(item) {
-      var pKey = item.phone !== '-' ? item.phone : item.fio;
-      if (!peopleMap[pKey]) {
-        peopleMap[pKey] = {
-          phone: item.phone,
-          fio: item.fio,
-          tkSet: new Set(),
-          citySet: new Set(),
-          specSet: new Set(),
-          p1: { shifts: 0, hours: 0, payout: 0 },
-          p2: { shifts: 0, hours: 0, payout: 0 }
-        };
-      }
-      if (item.tk) peopleMap[pKey].tkSet.add(item.tk);
-      if (item.city) peopleMap[pKey].citySet.add(item.city);
-      if (item.spec) peopleMap[pKey].specSet.add(item.spec);
-      return peopleMap[pKey];
-    }
-
-    recordsP1.forEach(function(item) {
-      var p = ensurePerson(item);
-      p.p1.shifts++;
-      p.p1.hours += (item.hours || 0);
-      p.p1.payout += (item.payout || 0);
-    });
-
-    recordsP2.forEach(function(item) {
-      var p = ensurePerson(item);
-      p.p2.shifts++;
-      p.p2.hours += (item.hours || 0);
-      p.p2.payout += (item.payout || 0);
-    });
-
-    var dataset = [];
-    var totalP1 = { count: 0, hours: 0, payout: 0 };
-    var totalP2 = { count: 0, hours: 0, payout: 0 };
-
-    Object.keys(peopleMap).forEach(function(k) {
-      var p = peopleMap[k];
-      var s1 = p.p1.shifts, s2 = p.p2.shifts;
-      var h1 = Math.round(p.p1.hours * 10) / 10, h2 = Math.round(p.p2.hours * 10) / 10;
-      var pay1 = Math.round(p.p1.payout), pay2 = Math.round(p.p2.payout);
-
-      if (s1 > 0) { totalP1.count++; totalP1.hours += h1; totalP1.payout += pay1; }
-      if (s2 > 0) { totalP2.count++; totalP2.hours += h2; totalP2.payout += pay2; }
-
-      var deltaShifts = s2 - s1;
-      var deltaHours = Math.round((h2 - h1) * 10) / 10;
-      var deltaPayout = pay2 - pay1;
-
-      var deltaShiftsHtml = '';
-      if (deltaShifts > 0) {
-        deltaShiftsHtml = '<span class="text-success fw-bold" data-sort="' + deltaShifts + '">+' + deltaShifts + '</span>';
-      } else if (deltaShifts < 0) {
-        deltaShiftsHtml = '<span class="text-danger fw-bold" data-sort="' + deltaShifts + '">' + deltaShifts + '</span>';
-      } else {
-        deltaShiftsHtml = '<span class="text-muted" data-sort="0">0</span>';
-      }
-
-      var deltaHoursHtml = '';
-      if (deltaHours > 0) {
-        deltaHoursHtml = '<span class="text-success fw-bold" data-sort="' + deltaHours + '">+' + deltaHours + ' ч.</span>';
-      } else if (deltaHours < 0) {
-        deltaHoursHtml = '<span class="text-danger fw-bold" data-sort="' + deltaHours + '">' + deltaHours + ' ч.</span>';
-      } else {
-        deltaHoursHtml = '<span class="text-muted" data-sort="0">0 ч.</span>';
-      }
-
-      var deltaPayoutHtml = '';
-      if (deltaPayout > 0) {
-        deltaPayoutHtml = '<span class="badge text-bg-success" style="font-size:0.8rem;" data-sort="' + deltaPayout + '">+' + deltaPayout.toLocaleString('ru-RU') + ' ₽</span>';
-      } else if (deltaPayout < 0) {
-        deltaPayoutHtml = '<span class="badge text-bg-danger" style="font-size:0.8rem;" data-sort="' + deltaPayout + '">' + deltaPayout.toLocaleString('ru-RU') + ' ₽</span>';
-      } else {
-        deltaPayoutHtml = '<span class="badge text-bg-secondary" style="font-size:0.8rem;" data-sort="0">0 ₽</span>';
-      }
-
-      var statusBadge = '';
-      var pctSort = 0;
-      if (s1 === 0 && s2 > 0) {
-        statusBadge = '<span class="badge text-bg-primary">✨ Новый</span>';
-        pctSort = 99999;
-      } else if (s1 > 0 && s2 === 0) {
-        statusBadge = '<span class="badge text-bg-secondary">💤 Не выходил</span>';
-        pctSort = -99999;
-      } else if (pay1 > 0) {
-        var pct = Math.round((deltaPayout / pay1) * 100);
-        pctSort = pct;
-        if (pct > 0) {
-          statusBadge = '<span class="badge text-bg-success">▲ +' + pct + '%</span>';
-        } else if (pct < 0) {
-          statusBadge = '<span class="badge text-bg-danger">▼ ' + pct + '%</span>';
-        } else {
-          statusBadge = '<span class="badge text-bg-light text-muted">= 0%</span>';
-        }
-      } else {
-        statusBadge = '<span class="text-muted">—</span>';
-      }
-
-      dataset.push([
-        escapeHtml(p.phone),
-        escapeHtml(p.fio),
-        escapeHtml(Array.from(p.tkSet).join(', ')),
-        escapeHtml(Array.from(p.citySet).join(', ')),
-        escapeHtml(Array.from(p.specSet).join(', ')),
-        // П1
-        '<span data-sort="' + s1 + '">' + s1 + '</span>',
-        '<span data-sort="' + h1 + '">' + h1 + ' ч.</span>',
-        '<span data-sort="' + pay1 + '">' + pay1.toLocaleString('ru-RU') + ' ₽</span>',
-        // П2
-        '<span data-sort="' + s2 + '">' + s2 + '</span>',
-        '<span data-sort="' + h2 + '">' + h2 + ' ч.</span>',
-        '<span class="fw-bold" data-sort="' + pay2 + '">' + pay2.toLocaleString('ru-RU') + ' ₽</span>',
-        // Динамика
-        deltaShiftsHtml,
-        deltaHoursHtml,
-        deltaPayoutHtml,
-        '<span data-sort="' + pctSort + '">' + statusBadge + '</span>'
-      ]);
-    });
-
-    // Update Totals Header
-    var diffCount = totalP2.count - totalP1.count;
-    var diffHours = Math.round((totalP2.hours - totalP1.hours) * 10) / 10;
-    var diffPayout = totalP2.payout - totalP1.payout;
+  // Обновление верхних карточек KPI для сравнения
+  function updateCompareTotalsHeader(t1, t2) {
+    var diffCount = t2.count - t1.count;
+    var diffHours = Math.round((t2.hours - t1.hours) * 10) / 10;
+    var diffPayout = t2.payout - t1.payout;
 
     var signC = diffCount >= 0 ? '+' : '';
     var signH = diffHours >= 0 ? '+' : '';
@@ -9797,15 +9826,204 @@
     var colorH = diffHours > 0 ? 'var(--ios-green)' : (diffHours < 0 ? 'var(--ios-red)' : 'var(--ios-blue)');
     var colorP = diffPayout > 0 ? 'var(--ios-green)' : (diffPayout < 0 ? 'var(--ios-red)' : 'var(--ios-orange)');
 
-    $('#rec-w-total-rows').html(totalP1.count + ' ➔ ' + totalP2.count + ' <span style="font-size:0.75rem; color:' + colorC + '">(' + signC + diffCount + ')</span>');
-    $('#rec-w-total-hours').html(Math.round(totalP1.hours) + ' ➔ ' + Math.round(totalP2.hours) + ' <span style="font-size:0.75rem; color:' + colorH + '">(' + signH + diffHours + ' ч.)</span>');
-    $('#rec-w-total-payout').html(totalP1.payout.toLocaleString('ru-RU') + ' ➔ ' + totalP2.payout.toLocaleString('ru-RU') + ' ₽<br><span style="font-size:0.75rem; color:' + colorP + '">(' + signP + diffPayout.toLocaleString('ru-RU') + ' ₽)</span>');
+    $('#rec-w-total-rows').html(t1.count + ' ➔ ' + t2.count + ' <span style="font-size:0.75rem; color:' + colorC + '">(' + signC + diffCount + ')</span>');
+    $('#rec-w-total-hours').html(Math.round(t1.hours) + ' ➔ ' + Math.round(t2.hours) + ' <span style="font-size:0.75rem; color:' + colorH + '">(' + signH + diffHours + ' ч.)</span>');
+    $('#rec-w-total-payout').html(t1.payout.toLocaleString('ru-RU') + ' ➔ ' + t2.payout.toLocaleString('ru-RU') + ' ₽<br><span style="font-size:0.75rem; color:' + colorP + '">(' + signP + diffPayout.toLocaleString('ru-RU') + ' ₽)</span>');
+  }
+
+  // 1. Отрисовка: Сравнение по людям
+  function renderComparePeopleTable(recordsP1, recordsP2, tableId, dtInstance, setDtCallback) {
+    var map = {};
+    function ensure(item) {
+      var pKey = item.phone !== '-' ? item.phone : item.fio;
+      if (!map[pKey]) {
+        map[pKey] = {
+          phone: item.phone, fio: item.fio,
+          tkSet: new Set(), citySet: new Set(), specSet: new Set(),
+          p1: { shifts: 0, hours: 0, payout: 0 },
+          p2: { shifts: 0, hours: 0, payout: 0 }
+        };
+      }
+      if (item.tk) map[pKey].tkSet.add(item.tk);
+      if (item.city) map[pKey].citySet.add(item.city);
+      if (item.spec) map[pKey].specSet.add(item.spec);
+      return map[pKey];
+    }
+    recordsP1.forEach(function(r) {
+      var p = ensure(r); p.p1.shifts++; p.p1.hours += (r.hours || 0); p.p1.payout += (r.payout || 0);
+    });
+    recordsP2.forEach(function(r) {
+      var p = ensure(r); p.p2.shifts++; p.p2.hours += (r.hours || 0); p.p2.payout += (r.payout || 0);
+    });
+
+    var dataset = [];
+    var totalP1 = { count: 0, hours: 0, payout: 0 };
+    var totalP2 = { count: 0, hours: 0, payout: 0 };
+
+    Object.keys(map).forEach(function(k) {
+      var p = map[k];
+      var s1 = p.p1.shifts, s2 = p.p2.shifts;
+      var h1 = Math.round(p.p1.hours * 10) / 10, h2 = Math.round(p.p2.hours * 10) / 10;
+      var pay1 = Math.round(p.p1.payout), pay2 = Math.round(p.p2.payout);
+
+      if (s1 > 0) { totalP1.count++; totalP1.hours += h1; totalP1.payout += pay1; }
+      if (s2 > 0) { totalP2.count++; totalP2.hours += h2; totalP2.payout += pay2; }
+
+      var dShifts = s2 - s1;
+      var dHours = Math.round((h2 - h1) * 10) / 10;
+      var dPayout = pay2 - pay1;
+      var isNew = (s1 === 0 && s2 > 0);
+
+      dataset.push([
+        escapeHtml(p.phone), escapeHtml(p.fio),
+        escapeHtml(Array.from(p.tkSet).join(', ')),
+        escapeHtml(Array.from(p.citySet).join(', ')),
+        escapeHtml(Array.from(p.specSet).join(', ')),
+        '<span data-sort="' + s1 + '">' + s1 + '</span>',
+        '<span data-sort="' + h1 + '">' + h1 + ' ч.</span>',
+        '<span data-sort="' + pay1 + '">' + pay1.toLocaleString('ru-RU') + ' ₽</span>',
+        '<span data-sort="' + s2 + '">' + s2 + '</span>',
+        '<span data-sort="' + h2 + '">' + h2 + ' ч.</span>',
+        '<span class="fw-bold" data-sort="' + pay2 + '">' + pay2.toLocaleString('ru-RU') + ' ₽</span>',
+        formatDeltaNum(dShifts, '', true),
+        formatDeltaNum(dHours, 'ч.', false),
+        formatDeltaPayoutBadge(dPayout),
+        '<span data-sort="' + (isNew ? 99999 : (s1 > 0 ? (dPayout / s1) : -99999)) + '">' + formatDynamicsBadge(pay1, pay2, dPayout, isNew) + '</span>'
+      ]);
+    });
+
+    updateCompareTotalsHeader(totalP1, totalP2);
 
     var dt = dtInstance;
-    if (!dt && $.fn.dataTable.isDataTable(tableId)) {
-      dt = $(tableId).DataTable();
+    if (!dt && $.fn.dataTable.isDataTable(tableId)) dt = $(tableId).DataTable();
+    if (dt) {
+      dt.clear().rows.add(dataset).draw(false);
+      recalcTableSafely(dt);
+      setDtCallback(dt);
+      makeTableResizable(tableId);
+      return;
+    }
+    var newDt = $(tableId).DataTable({
+      autoWidth: false, language: DT_RU_LANG, pageLength: 25, data: dataset,
+      order: [[13, 'desc']], responsive: false,
+      columnDefs: [
+        { targets: 0, className: 'text-center fw-semibold' },
+        { targets: 1, className: 'text-start' },
+        { targets: [2, 3, 4], className: 'text-center' },
+        { targets: [5, 6, 7], className: 'text-center' },
+        { targets: [8, 9, 10], className: 'text-center' },
+        { targets: [11, 12, 13, 14], className: 'text-center' }
+      ]
+    });
+    setDtCallback(newDt);
+    recalcTableSafely(newDt);
+    makeTableResizable(tableId);
+  }
+
+  // 2. Отрисовка: Сравнение по Городам, ТК или Специальностям
+  function renderCompareGroupTable(recordsP1, recordsP2, mode, tableId, dtInstance, setDtCallback) {
+    var map = {};
+    function getKeyInfo(item) {
+      if (mode === 'city') {
+        var c = (item.city || '').toString().trim() || 'Без города';
+        return { key: c, label1: c, label2: '' };
+      } else if (mode === 'tk') {
+        var tk = (item.tk || '').toString().trim() || 'Без ТК';
+        var c = (item.city || '').toString().trim();
+        return { key: tk + '__' + c, label1: 'ТК №' + tk, label2: c };
+      } else {
+        var sp = (item.spec || '').toString().trim() || 'Без специальности';
+        return { key: sp, label1: sp, label2: '' };
+      }
     }
 
+    function ensure(item) {
+      var info = getKeyInfo(item);
+      if (!map[info.key]) {
+        map[info.key] = {
+          label1: info.label1, label2: info.label2,
+          people1: new Set(), people2: new Set(),
+          p1: { shifts: 0, hours: 0, payout: 0 },
+          p2: { shifts: 0, hours: 0, payout: 0 }
+        };
+      }
+      return map[info.key];
+    }
+
+    recordsP1.forEach(function(r) {
+      var g = ensure(r);
+      var pId = r.phone !== '-' ? r.phone : r.fio;
+      if (pId) g.people1.add(pId);
+      g.p1.shifts++; g.p1.hours += (r.hours || 0); g.p1.payout += (r.payout || 0);
+    });
+
+    recordsP2.forEach(function(r) {
+      var g = ensure(r);
+      var pId = r.phone !== '-' ? r.phone : r.fio;
+      if (pId) g.people2.add(pId);
+      g.p2.shifts++; g.p2.hours += (r.hours || 0); g.p2.payout += (r.payout || 0);
+    });
+
+    var dataset = [];
+    var totalP1 = { count: 0, hours: 0, payout: 0 };
+    var totalP2 = { count: 0, hours: 0, payout: 0 };
+    var globalPeople1 = new Set(), globalPeople2 = new Set();
+
+    Object.keys(map).forEach(function(k) {
+      var g = map[k];
+      var peo1 = g.people1.size, peo2 = g.people2.size;
+      var s1 = g.p1.shifts, s2 = g.p2.shifts;
+      var h1 = Math.round(g.p1.hours * 10) / 10, h2 = Math.round(g.p2.hours * 10) / 10;
+      var pay1 = Math.round(g.p1.payout), pay2 = Math.round(g.p2.payout);
+
+      if (peo1 > 0) { totalP1.hours += h1; totalP1.payout += pay1; }
+      if (peo2 > 0) { totalP2.hours += h2; totalP2.payout += pay2; }
+
+      var dPeople = peo2 - peo1;
+      var dShifts = s2 - s1;
+      var dHours = Math.round((h2 - h1) * 10) / 10;
+      var dPayout = pay2 - pay1;
+      var isNew = (peo1 === 0 && peo2 > 0);
+
+      var row = [];
+      if (mode === 'tk') {
+        row.push('<strong>' + escapeHtml(g.label1) + '</strong>');
+        row.push(escapeHtml(g.label2));
+      } else {
+        row.push('<strong>' + escapeHtml(g.label1) + '</strong>');
+      }
+
+      // П1
+      row.push('<span data-sort="' + peo1 + '">' + peo1 + ' чел.</span>');
+      row.push('<span data-sort="' + s1 + '">' + s1 + '</span>');
+      row.push('<span data-sort="' + h1 + '">' + h1 + ' ч.</span>');
+      row.push('<span data-sort="' + pay1 + '">' + pay1.toLocaleString('ru-RU') + ' ₽</span>');
+
+      // П2
+      row.push('<span data-sort="' + peo2 + '">' + peo2 + ' чел.</span>');
+      row.push('<span data-sort="' + s2 + '">' + s2 + '</span>');
+      row.push('<span data-sort="' + h2 + '">' + h2 + ' ч.</span>');
+      row.push('<span class="fw-bold" data-sort="' + pay2 + '">' + pay2.toLocaleString('ru-RU') + ' ₽</span>');
+
+      // Дельты
+      row.push(formatDeltaNum(dPeople, 'чел.', true));
+      row.push(formatDeltaNum(dShifts, '', true));
+      row.push(formatDeltaNum(dHours, 'ч.', false));
+      row.push(formatDeltaPayoutBadge(dPayout));
+      row.push('<span data-sort="' + (isNew ? 99999 : (pay1 > 0 ? (dPayout / pay1) : -99999)) + '">' + formatDynamicsBadge(pay1, pay2, dPayout, isNew) + '</span>');
+
+      dataset.push(row);
+    });
+
+    recordsP1.forEach(function(r) { var id = r.phone !== '-' ? r.phone : r.fio; if (id) globalPeople1.add(id); });
+    recordsP2.forEach(function(r) { var id = r.phone !== '-' ? r.phone : r.fio; if (id) globalPeople2.add(id); });
+    totalP1.count = globalPeople1.size;
+    totalP2.count = globalPeople2.size;
+
+    updateCompareTotalsHeader(totalP1, totalP2);
+
+    var dt = dtInstance;
+    if (!dt && $.fn.dataTable.isDataTable(tableId)) dt = $(tableId).DataTable();
     if (dt) {
       dt.clear().rows.add(dataset).draw(false);
       recalcTableSafely(dt);
@@ -9814,20 +10032,13 @@
       return;
     }
 
+    var orderIdx = (mode === 'tk') ? 13 : 12; // Индекс колонки ФОТ (± ₽)
     var newDt = $(tableId).DataTable({
-      autoWidth: false,
-      language: DT_RU_LANG,
-      pageLength: 25,
-      data: dataset,
-      order: [[13, 'desc']], // Сортировка по разнице выплат (ФОТ)
-      responsive: false,
+      autoWidth: false, language: DT_RU_LANG, pageLength: 25, data: dataset,
+      order: [[orderIdx, 'desc']], responsive: false,
       columnDefs: [
-        { targets: 0, className: 'text-center fw-semibold' },
-        { targets: 1, className: 'text-start' },
-        { targets: [2, 3, 4], className: 'text-center' },
-        { targets: [5, 6, 7], className: 'text-center' },
-        { targets: [8, 9, 10], className: 'text-center' },
-        { targets: [11, 12, 13, 14], className: 'text-center' }
+        { targets: 0, className: 'text-start fw-semibold' },
+        { targets: '_all', className: 'text-center' }
       ]
     });
     setDtCallback(newDt);
